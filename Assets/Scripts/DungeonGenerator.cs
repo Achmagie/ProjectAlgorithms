@@ -3,21 +3,16 @@ using UnityEngine;
 
 public class DungeonGenerator : MonoBehaviour
 {
-    [SerializeField] Vector2Int areaSize;
+    [SerializeField] Vector2Int dungeonSize;
     [SerializeField] private Vector2Int minRoomSize;
     
     private List<Room> rooms = new List<Room>();
-    private Room parentRoom;
-
-    [SerializeField] private bool splitHorizontally; 
-
-
-    private bool minSizeHit = false;
+    private Room startRoom;
 
     void Start() {
-        parentRoom = new Room(new Vector2Int(0, 0), areaSize);
+        startRoom = new Room(new Vector2Int(0, 0), dungeonSize);
 
-        SplitRoom(parentRoom);
+        GenerateDungeon();
     }
 
     void Update() {
@@ -28,17 +23,26 @@ public class DungeonGenerator : MonoBehaviour
         }
     }
 
-    private void SplitRoom(Room room) {
-        if (room.Size.x <= minRoomSize.x || room.Size.y <= minRoomSize.y) return;
+    private void GenerateDungeon() {
+        Queue<(Room, bool)> roomQueue = new Queue<(Room, bool)>();
+        roomQueue.Enqueue((startRoom, true));
 
-        (Room newRoom1, Room newRoom2) =  room.Split(splitHorizontally);
+        while (roomQueue.Count > 0) {
+            (Room room, bool splitHorizontally) = roomQueue.Dequeue();
 
-        rooms.Add(newRoom1);
-        rooms.Add(newRoom2);
+            if (room.Size.x / 2 <= minRoomSize.x && room.Size.y / 2 <= minRoomSize.y) continue;
 
-        splitHorizontally = !splitHorizontally;
+            if (room.Size.x / 2 > minRoomSize.x) splitHorizontally = true;
+            else if (room.Size.y / 2 > minRoomSize.y) splitHorizontally = false;
 
-        SplitRoom(newRoom1);
-        SplitRoom(newRoom2);
+            (Room newRoom1, Room newRoom2) = room.Split(splitHorizontally);
+
+            rooms.Remove(room);
+            rooms.Add(newRoom1);
+            rooms.Add(newRoom2);
+
+            roomQueue.Enqueue((newRoom1, splitHorizontally));
+            roomQueue.Enqueue((newRoom2, !splitHorizontally));
+        }
     }
 }
