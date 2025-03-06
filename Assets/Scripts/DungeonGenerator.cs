@@ -23,19 +23,18 @@ public class DungeonGenerator : MonoBehaviour
         }
     }
 
-    private void GenerateDungeon() {
+    public void GenerateDungeon() {
+        rooms.Clear();
+        
         Queue<(Room, bool)> roomQueue = new Queue<(Room, bool)>();
-        roomQueue.Enqueue((startRoom, true));
+        roomQueue.Enqueue((startRoom, Random.value > .5f));
 
         while (roomQueue.Count > 0) {
             (Room room, bool splitHorizontally) = roomQueue.Dequeue();
+            
+            (Room newRoom1, Room newRoom2) = room.Split(splitHorizontally, minRoomSize);
 
-            if (room.Size.x / 2 <= minRoomSize.x && room.Size.y / 2 <= minRoomSize.y) continue;
-
-            if (room.Size.x / 2 > minRoomSize.x) splitHorizontally = true;
-            else if (room.Size.y / 2 > minRoomSize.y) splitHorizontally = false;
-
-            (Room newRoom1, Room newRoom2) = room.Split(splitHorizontally);
+            if (newRoom1 == null && newRoom2 == null) continue;
 
             rooms.Remove(room);
             rooms.Add(newRoom1);

@@ -5,6 +5,8 @@ public class Room
     private Vector2Int position;
     private Vector2Int size;
 
+    private const int WALL_SIZE = 1;
+
     public Vector2Int Position { 
         get => position;
         private set => position = value;
@@ -22,19 +24,29 @@ public class Room
         this.size = size;
     }
 
-    public (Room room1, Room room2) Split(bool splitHorizontally) {
+    public (Room room1, Room room2) Split(bool splitHorizontally, Vector2Int minRoomSize) {
         if (splitHorizontally) {
-            int splitX = Position.x + Size.x / 2;
+            int minX = Position.x + minRoomSize.x;
+            int maxX = Position.x + Size.x - minRoomSize.x;
 
-            Room room1 = new Room(Position, new Vector2Int(Size.x / 2, Size.y));
-            Room room2 = new Room(new Vector2Int(splitX - 1, Position.y), new Vector2Int(Size.x - Size.x / 2 + 1, Size.y));
+            if (minX >= maxX) return (null, null);
+
+            int splitX = Random.Range(minX, maxX);
+
+            Room room1 = new Room(Position, new Vector2Int(splitX - Position.x, Size.y));
+            Room room2 = new Room(new Vector2Int(splitX + WALL_SIZE, Position.y), new Vector2Int(Position.x + Size.x - splitX - WALL_SIZE, Size.y));
 
             return (room1, room2);
         } else {
-            int splitY = Position.y + Size.y / 2;
+            int minY = Position.y + minRoomSize.y;
+            int maxY = Position.y + Size.y - minRoomSize.y;
 
-            Room room1 = new Room(Position, new Vector2Int(Size.x, Size.y / 2));
-            Room room2 = new Room(new Vector2Int(Position.x, splitY - 1), new Vector2Int(Size.x, Size.y - Size.y / 2 + 1));
+            if (minY >= maxY) return (null, null);
+
+            int splitY = Random.Range(minY, maxY);
+
+            Room room1 = new Room(Position, new Vector2Int(Size.x, splitY - Position.y));
+            Room room2 = new Room(new Vector2Int(Position.x, splitY + WALL_SIZE), new Vector2Int(Size.x, Position.y + Size.y - splitY - WALL_SIZE));
 
             return (room1, room2);
         }
