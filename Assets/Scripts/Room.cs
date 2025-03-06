@@ -4,6 +4,7 @@ public class Room
 {
     private Vector2Int position;
     private Vector2Int size;
+    private bool hasTriedToSplit = false;
 
     private const int WALL_SIZE = 1;
 
@@ -29,24 +30,34 @@ public class Room
             int minX = Position.x + minRoomSize.x;
             int maxX = Position.x + Size.x - minRoomSize.x;
 
-            if (minX >= maxX) return (null, null);
+            if (minX >= maxX) {
+                if (!hasTriedToSplit) {
+                    hasTriedToSplit = true;
+                    return Split(!splitHorizontally, minRoomSize);
+                } else return (null, null);
+            } 
 
             int splitX = Random.Range(minX, maxX);
 
             Room room1 = new Room(Position, new Vector2Int(splitX - Position.x, Size.y));
-            Room room2 = new Room(new Vector2Int(splitX + WALL_SIZE, Position.y), new Vector2Int(Position.x + Size.x - splitX - WALL_SIZE, Size.y));
+            Room room2 = new Room(new Vector2Int(splitX - WALL_SIZE, Position.y), new Vector2Int(Position.x + Size.x - splitX + WALL_SIZE, Size.y));
 
             return (room1, room2);
         } else {
             int minY = Position.y + minRoomSize.y;
             int maxY = Position.y + Size.y - minRoomSize.y;
 
-            if (minY >= maxY) return (null, null);
+            if (minY >= maxY) {
+                if (!hasTriedToSplit) {
+                    hasTriedToSplit = true;
+                    return Split(!splitHorizontally, minRoomSize);
+                } else return (null, null);
+            } 
 
             int splitY = Random.Range(minY, maxY);
 
             Room room1 = new Room(Position, new Vector2Int(Size.x, splitY - Position.y));
-            Room room2 = new Room(new Vector2Int(Position.x, splitY + WALL_SIZE), new Vector2Int(Size.x, Position.y + Size.y - splitY - WALL_SIZE));
+            Room room2 = new Room(new Vector2Int(Position.x, splitY - WALL_SIZE), new Vector2Int(Size.x, Position.y + Size.y - splitY + WALL_SIZE));
 
             return (room1, room2);
         }
