@@ -472,7 +472,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dungeonSize: {x: 100, y: 100}
   minRoomSize: {x: 10, y: 10}
-  timeBetweenRooms: 1
+  timeBetweenRooms: 0.1
   generationType: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
