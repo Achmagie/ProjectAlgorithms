@@ -84,8 +84,27 @@ public class DungeonGenerator : MonoBehaviour
             Room room2 = room.childRooms[1];
 
             if (AlgorithmsUtils.Intersects(room1.Bounds, room2.Bounds)) {
-                RectInt door = AlgorithmsUtils.Intersect(room1.Bounds, room2.Bounds);
-                
+                RectInt doorArea = AlgorithmsUtils.Intersect(room1.Bounds, room2.Bounds);
+
+                if (doorArea.width == 1 && doorArea.height == 1) {
+                    if (room1.Bounds.width > room1.Bounds.height) {
+                        doorArea = new RectInt(doorArea.x, doorArea.y - 1, 1, 1);
+                    } else {
+                        doorArea = new RectInt(doorArea.x - 1, doorArea.y, 1, 1); 
+                    }
+                }
+
+                Vector2Int doorPosition;
+
+                if (doorArea.width > doorArea.height) {
+                    doorPosition = new Vector2Int(doorArea.xMin + doorArea.width / 2, doorArea.yMin);
+
+                    doors.Add(new RectInt(doorPosition, new Vector2Int(2, 1)));
+                } else {
+                    doorPosition = new Vector2Int(doorArea.xMin, doorArea.yMin + doorArea.height / 2);
+
+                    doors.Add(new RectInt(doorPosition, new Vector2Int(1, 2)));
+                }
             }
 
             doorQueue.Enqueue(room1);
