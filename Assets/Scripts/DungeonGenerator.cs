@@ -15,12 +15,8 @@ public class DungeonGenerator : MonoBehaviour
         KEYPRESS
     }
     
-    private List<Room> rooms = new List<Room>();
+    public List<Room> rooms = new List<Room>();
     private Room startRoom;
-
-    void Start() {
-        startRoom = new Room(new Vector2Int(0, 0), dungeonSize);
-    }
 
     void Update() {
         if (rooms.Count == 0) return;
@@ -31,6 +27,8 @@ public class DungeonGenerator : MonoBehaviour
     }
 
     private IEnumerator GenerateDungeon() {
+        startRoom = new Room(new Vector2Int(0, 0), dungeonSize);
+
         rooms.Clear();
         rooms.Add(startRoom);
         
@@ -61,10 +59,22 @@ public class DungeonGenerator : MonoBehaviour
                     break;
             }
         }
+
+        GenerateDoors(startRoom);
+        Debug.Log("Room Amount: " + rooms.Count);
     }
 
     public void StartDungeonGeneration() {
         StopAllCoroutines();
         StartCoroutine(GenerateDungeon());
+    }
+
+    public void GenerateDoors(Room room) {
+        foreach (Room r in room.childRooms) {
+            if (r.childRooms.Count == 0) return;
+
+            Debug.Log(r.ChildIntersects());
+            GenerateDoors(r);
+        }
     }
 }
