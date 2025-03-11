@@ -11,5 +11,9 @@ public class DungeonGeneratorEditor : Editor {
         if (GUILayout.Button("Generate Dungeon")) {
             dungeonGenerator.StartDungeonGeneration();
         }
+
+        if (GUILayout.Button("Generate Doors")) {
+            dungeonGenerator.StartDoorGeneration();
+        }
     }
 }

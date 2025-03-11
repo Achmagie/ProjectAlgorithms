@@ -474,6 +474,7 @@ MonoBehaviour:
   minRoomSize: {x: 10, y: 10}
   timeBetweenRooms: 0.1
   generationType: 2
+  rooms: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -6,7 +6,7 @@ public class DungeonGenerator : MonoBehaviour
 {
     [SerializeField] Vector2Int dungeonSize;
     [SerializeField] private Vector2Int minRoomSize;
-    [SerializeField] private float timeBetweenRooms;
+    [SerializeField] private float timeBetween;
     [SerializeField] private GenerationType generationType;
 
     public enum GenerationType {
@@ -15,7 +15,9 @@ public class DungeonGenerator : MonoBehaviour
         KEYPRESS
     }
     
-    public List<Room> rooms = new List<Room>();
+    private List<Room> rooms = new List<Room>();
+    private List<RectInt> doors = new List<RectInt>();
+
     private Room startRoom;
 
     void Update() {
@@ -23,6 +25,10 @@ public class DungeonGenerator : MonoBehaviour
 
         foreach (Room room in rooms) {
             AlgorithmsUtils.DebugRectInt(room.Bounds, Color.red);
+        }
+
+        foreach (RectInt door in doors) {
+            AlgorithmsUtils.DebugRectInt(door, Color.blue);
         }
     }
 
@@ -51,7 +57,7 @@ public class DungeonGenerator : MonoBehaviour
 
             switch (generationType) {
                 case GenerationType.TIMED:
-                    yield return new WaitForSeconds(timeBetweenRooms);
+                    yield return new WaitForSeconds(timeBetween);
                     break;
             
                 case GenerationType.KEYPRESS:
@@ -60,8 +66,41 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
 
-        GenerateDoors(startRoom);
-        Debug.Log("Room Amount: " + rooms.Count);
+        // GenerateDoors(startRoom);
+    }
+
+    private IEnumerator GenerateDoors() {
+        doors.Clear();
+
+        Queue<Room> doorQueue = new Queue<Room>();
+        doorQueue.Enqueue(startRoom);
+
+        while (doorQueue.Count > 0) {
+            Room room = doorQueue.Dequeue();
+
+            if (room.childRooms.Count < 2) continue;
+
+            Room room1 = room.childRooms[0];
+            Room room2 = room.childRooms[1];
+
+            if (AlgorithmsUtils.Intersects(room1.Bounds, room2.Bounds)) {
+                RectInt door = AlgorithmsUtils.Intersect(room1.Bounds, room2.Bounds);
+                
+            }
+
+            doorQueue.Enqueue(room1);
+            doorQueue.Enqueue(room2);
+
+            switch (generationType) {
+                case GenerationType.TIMED:
+                    yield return new WaitForSeconds(timeBetween);
+                    break;
+            
+                case GenerationType.KEYPRESS:
+                    yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
+                    break;
+            }
+        }
     }
 
     public void StartDungeonGeneration() {
@@ -69,12 +108,8 @@ public class DungeonGenerator : MonoBehaviour
         StartCoroutine(GenerateDungeon());
     }
 
-    public void GenerateDoors(Room room) {
-        foreach (Room r in room.childRooms) {
-            if (r.childRooms.Count == 0) return;
-
-            Debug.Log(r.ChildIntersects());
-            GenerateDoors(r);
-        }
+    public void StartDoorGeneration() {
+        StopAllCoroutines();
+        StartCoroutine(GenerateDoors());
     }
 }
