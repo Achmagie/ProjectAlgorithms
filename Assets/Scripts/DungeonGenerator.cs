@@ -65,60 +65,48 @@ public class DungeonGenerator : MonoBehaviour
                     break;
             }
         }
-
-        // GenerateDoors(startRoom);
     }
 
     private IEnumerator GenerateDoors() {
         doors.Clear();
 
-        Queue<Room> doorQueue = new Queue<Room>();
-        doorQueue.Enqueue(startRoom);
-
-        while (doorQueue.Count > 0) {
-            Room room = doorQueue.Dequeue();
-
-            if (room.childRooms.Count < 2) continue;
-
-            Room room1 = room.childRooms[0];
-            Room room2 = room.childRooms[1];
-
-            if (AlgorithmsUtils.Intersects(room1.Bounds, room2.Bounds)) {
-                RectInt doorArea = AlgorithmsUtils.Intersect(room1.Bounds, room2.Bounds);
-
-                if (doorArea.width == 1 && doorArea.height == 1) {
-                    if (room1.Bounds.width > room1.Bounds.height) {
-                        doorArea = new RectInt(doorArea.x, doorArea.y - 1, 1, 1);
-                    } else {
-                        doorArea = new RectInt(doorArea.x - 1, doorArea.y, 1, 1); 
-                    }
-                }
-
-                Vector2Int doorPosition;
-
-                if (doorArea.width > doorArea.height) {
-                    doorPosition = new Vector2Int(doorArea.xMin + doorArea.width / 2, doorArea.yMin);
-
-                    doors.Add(new RectInt(doorPosition, new Vector2Int(2, 1)));
-                } else {
-                    doorPosition = new Vector2Int(doorArea.xMin, doorArea.yMin + doorArea.height / 2);
-
-                    doors.Add(new RectInt(doorPosition, new Vector2Int(1, 2)));
-                }
+        for (int i = 0; i < rooms.Count; i++) {
+            for (int j = i + 1; j < rooms.Count; j++) {
+                CreateDoor(rooms[i].Bounds, rooms[j].Bounds);
             }
+        }
 
-            doorQueue.Enqueue(room1);
-            doorQueue.Enqueue(room2);
+        switch (generationType) {
+            case GenerationType.TIMED:
+                yield return new WaitForSeconds(timeBetween);
+                break;
+        
+            case GenerationType.KEYPRESS:
+                yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
+                break;
+        }
+        
+    }
 
-            switch (generationType) {
-                case GenerationType.TIMED:
-                    yield return new WaitForSeconds(timeBetween);
-                    break;
-            
-                case GenerationType.KEYPRESS:
-                    yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
-                    break;
+    private void CreateDoor(RectInt room1, RectInt room2) {
+        RectInt doorArea = AlgorithmsUtils.Intersect(room1, room2);
+
+        if (doorArea.width == 1 && doorArea.height == 1) {
+            if (room1.width > room1.height) {
+                doorArea = new RectInt(doorArea.x, doorArea.y - 1, 1, 1);
+            } else {
+                doorArea = new RectInt(doorArea.x - 1, doorArea.y, 1, 1); 
             }
+        }
+
+        Vector2Int doorPosition;
+
+        if (doorArea.width > doorArea.height) {
+            doorPosition = new Vector2Int(doorArea.xMin + doorArea.width / 2, doorArea.yMin);
+            doors.Add(new RectInt(doorPosition, new Vector2Int(2, 1)));
+        } else {
+            doorPosition = new Vector2Int(doorArea.xMin, doorArea.yMin + doorArea.height / 2);
+            doors.Add(new RectInt(doorPosition, new Vector2Int(1, 2)));
         }
     }
 
