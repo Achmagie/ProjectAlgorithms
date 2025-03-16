@@ -73,41 +73,32 @@ public class DungeonGenerator : MonoBehaviour
         for (int i = 0; i < rooms.Count; i++) {
             for (int j = i + 1; j < rooms.Count; j++) {
                 CreateDoor(rooms[i].Bounds, rooms[j].Bounds);
+
+                switch (generationType) {
+                    case GenerationType.TIMED:
+                        yield return new WaitForSeconds(timeBetween);
+                        break;
+                
+                    case GenerationType.KEYPRESS:
+                        yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
+                        break;
+                }
             }
         }
-
-        switch (generationType) {
-            case GenerationType.TIMED:
-                yield return new WaitForSeconds(timeBetween);
-                break;
-        
-            case GenerationType.KEYPRESS:
-                yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
-                break;
-        }
-        
     }
 
     private void CreateDoor(RectInt room1, RectInt room2) {
-        RectInt doorArea = AlgorithmsUtils.Intersect(room1, room2);
+        RectInt intersection = AlgorithmsUtils.Intersect(room1, room2);
 
-        if (doorArea.width == 1 && doorArea.height == 1) {
-            if (room1.width > room1.height) {
-                doorArea = new RectInt(doorArea.x, doorArea.y - 1, 1, 1);
-            } else {
-                doorArea = new RectInt(doorArea.x - 1, doorArea.y, 1, 1); 
-            }
-        }
+        if (intersection.width <= 4 && intersection.height <= 4) return;
 
         Vector2Int doorPosition;
 
-        if (doorArea.width > doorArea.height) {
-            doorPosition = new Vector2Int(doorArea.xMin + doorArea.width / 2, doorArea.yMin);
-            doors.Add(new RectInt(doorPosition, new Vector2Int(2, 1)));
-        } else {
-            doorPosition = new Vector2Int(doorArea.xMin, doorArea.yMin + doorArea.height / 2);
-            doors.Add(new RectInt(doorPosition, new Vector2Int(1, 2)));
-        }
+        if (intersection.width > 1) doorPosition = new Vector2Int(Random.Range(intersection.xMin + 2, intersection.xMin + intersection.width - 2), intersection.yMin);
+        else if (intersection.height > 1) doorPosition = new Vector2Int(intersection.xMin, Random.Range(intersection.yMin + 2, intersection.yMin + intersection.height - 2));
+        else return;
+
+        doors.Add(new RectInt(doorPosition, new Vector2Int(1, 1)));
     }
 
     public void StartDungeonGeneration() {
