@@ -473,7 +473,7 @@ MonoBehaviour:
   dungeonSize: {x: 100, y: 100}
   minRoomSize: {x: 10, y: 10}
   timeBetween: 0
-  generationType: 2
+  generationType: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
