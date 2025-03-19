@@ -17,11 +17,13 @@ public class DungeonGenerator : MonoBehaviour
         KEYPRESS
     }
     
-    private readonly List<Room> rooms = new List<Room>();
+    private readonly List<Room> rooms = new();
     // private Dictionary<Room, Vector2Int> rooms = new();
-    private readonly List<RectInt> doors = new List<RectInt>();
+    private readonly List<RectInt> doors = new();
 
-    private readonly Graph<Vector2> graph = new Graph<Vector2>();
+    private readonly Graph<Vector2> graph = new();
+    private readonly HashSet<Vector2> discoveredNodes = new();
+    private readonly List<Vector2> nodes = new();
 
     private Room startRoom;
 
@@ -35,6 +37,22 @@ public class DungeonGenerator : MonoBehaviour
         foreach (RectInt door in doors) {
             AlgorithmsUtils.DebugRectInt(door, Color.blue);
         }
+
+        foreach (Vector2 node in nodes) {
+            DebugExtension.DebugCircle(new Vector3(node.x, 0, node.y), Vector3.up, Color.green);
+            
+            foreach (Vector2 edge in graph.GetNeighbors(node)) {
+                UnityEngine.Debug.DrawLine(new Vector3(node.x, 0, node.y), new Vector3(edge.x, 0, edge.y));
+            }
+        }
+
+        foreach (Vector2 node in discoveredNodes) {
+            DebugExtension.DebugCircle(new Vector3(node.x, 0, node.y), Vector3.up, Color.blue);
+            
+            foreach (Vector2 edge in graph.GetNeighbors(node)) {
+                UnityEngine.Debug.DrawLine(new Vector3(node.x, 0, node.y), new Vector3(edge.x, 0, edge.y), Color.blue);
+            }
+        }
     }
 
     private IEnumerator GenerateDungeon() {
@@ -42,8 +60,6 @@ public class DungeonGenerator : MonoBehaviour
 
         rooms.Clear();
         rooms.Add(startRoom);
-
-        graph.AddNode(startRoom.Position);
         
         Queue<(Room, bool)> roomQueue = new Queue<(Room, bool)>();
         roomQueue.Enqueue((startRoom, Random.value > .5f));
@@ -59,9 +75,6 @@ public class DungeonGenerator : MonoBehaviour
             rooms.Add(newRoom1);
             rooms.Add(newRoom2);
 
-            AddRoomNode(newRoom1);
-            AddRoomNode(newRoom2);
-
             roomQueue.Enqueue((newRoom1, splitHorizontally));
             roomQueue.Enqueue((newRoom2, !splitHorizontally));
 
@@ -75,6 +88,8 @@ public class DungeonGenerator : MonoBehaviour
                     break;
             }
         }
+
+        rooms.ForEach(r => AddRoomNode(r));
     }
 
     private IEnumerator GenerateDoors() {
@@ -163,6 +178,40 @@ public class DungeonGenerator : MonoBehaviour
         graph.AddNode(room.Bounds.center);
     }
 
+    public IEnumerator GenerateGraph() {
+        foreach (Vector2 node in graph.GetNodes()) {
+            nodes.Add(node);
+
+            switch (generationType) {
+                case GenerationType.TIMED:
+                    yield return new WaitForSeconds(timeBetween);
+                    break;
+            
+                case GenerationType.KEYPRESS:
+                    yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
+                    break;
+            }
+        }
+    }
+
+    public IEnumerator SearchGraph() {
+        HashSet<Vector2> discovered = graph.BFS(graph.GetNodes()[0]);
+
+        foreach (Vector2 node in discovered) {
+            discoveredNodes.Add(node);
+
+            switch (generationType) {
+                case GenerationType.TIMED:
+                    yield return new WaitForSeconds(timeBetween);
+                    break;
+            
+                case GenerationType.KEYPRESS:
+                    yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
+                    break;
+            }
+        }
+    }
+
     public void StartDungeonGeneration() {
         StopAllCoroutines();
         StartCoroutine(GenerateDungeon());
@@ -171,5 +220,15 @@ public class DungeonGenerator : MonoBehaviour
     public void StartDoorGeneration() {
         StopAllCoroutines();
         StartCoroutine(GenerateDoors());
+    }
+
+    public void StartGraphGeneration() {
+        StopAllCoroutines();
+        StartCoroutine(GenerateGraph());
+    }
+
+    public void StartGraphSearch() {
+        StopAllCoroutines();
+        StartCoroutine(SearchGraph());
     }
 }

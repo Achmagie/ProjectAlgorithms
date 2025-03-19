@@ -85,7 +85,7 @@ public class Graph<T>
     }
     
     // Breadth-First Search (BFS)
-    public void BFS(T v)
+    public HashSet<T> BFS(T v)
     {
         HashSet<T> discovered = new HashSet<T>();
         Queue<T> Q = new Queue<T>();
@@ -106,10 +106,12 @@ public class Graph<T>
                 }
             }
         }
+
+        return discovered;
     }
 
     // Depth-First Search (DFS)
-    public void DFS(T v)
+    public HashSet<T> DFS(T v)
     {
         HashSet<T> discovered = new HashSet<T>();
         
@@ -128,5 +130,7 @@ public class Graph<T>
                 }
             }
         }
+
+        return discovered;
     }
 }

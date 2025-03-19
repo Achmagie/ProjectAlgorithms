@@ -15,5 +15,13 @@ public class DungeonGeneratorEditor : Editor {
         if (GUILayout.Button("Generate Doors")) {
             dungeonGenerator.StartDoorGeneration();
         }
+
+        if (GUILayout.Button("Generate Graph")) {
+            dungeonGenerator.StartGraphGeneration();
+        }
+
+        if (GUILayout.Button("Start DFS")) {
+            dungeonGenerator.StartGraphSearch();
+        }
     }
 }
