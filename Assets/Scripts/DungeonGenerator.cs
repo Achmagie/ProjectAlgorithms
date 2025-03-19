@@ -17,9 +17,11 @@ public class DungeonGenerator : MonoBehaviour
         KEYPRESS
     }
     
-    private List<Room> rooms = new List<Room>();
+    private readonly List<Room> rooms = new List<Room>();
     // private Dictionary<Room, Vector2Int> rooms = new();
-    private List<RectInt> doors = new List<RectInt>();
+    private readonly List<RectInt> doors = new List<RectInt>();
+
+    private readonly Graph<Vector2> graph = new Graph<Vector2>();
 
     private Room startRoom;
 
@@ -40,6 +42,8 @@ public class DungeonGenerator : MonoBehaviour
 
         rooms.Clear();
         rooms.Add(startRoom);
+
+        graph.AddNode(startRoom.Position);
         
         Queue<(Room, bool)> roomQueue = new Queue<(Room, bool)>();
         roomQueue.Enqueue((startRoom, Random.value > .5f));
@@ -54,6 +58,9 @@ public class DungeonGenerator : MonoBehaviour
             rooms.Remove(room);
             rooms.Add(newRoom1);
             rooms.Add(newRoom2);
+
+            AddRoomNode(newRoom1);
+            AddRoomNode(newRoom2);
 
             roomQueue.Enqueue((newRoom1, splitHorizontally));
             roomQueue.Enqueue((newRoom2, !splitHorizontally));
@@ -146,6 +153,14 @@ public class DungeonGenerator : MonoBehaviour
         else return;
 
         doors.Add(new RectInt(doorPosition, new Vector2Int(1, 1)));
+        graph.AddNode(doorPosition);
+
+        graph.AddEdge(doorPosition, room1.center);
+        graph.AddEdge(doorPosition, room2.center);
+    }
+
+    private void AddRoomNode(Room room) {
+        graph.AddNode(room.Bounds.center);
     }
 
     public void StartDungeonGeneration() {

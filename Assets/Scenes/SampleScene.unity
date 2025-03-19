@@ -471,7 +471,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dungeonSize: {x: 100, y: 100}
-  minRoomSize: {x: 10, y: 10}
+  minRoomSize: {x: 25, y: 25}
   timeBetween: 0
   generationType: 0
 --- !u!1660057539 &9223372036854775807
