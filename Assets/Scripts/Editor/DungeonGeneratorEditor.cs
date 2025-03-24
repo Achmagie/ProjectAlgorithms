@@ -1,27 +1,27 @@
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(DungeonGenerator))]
+[CustomEditor(typeof(DungeonBuilder))]
 public class DungeonGeneratorEditor : Editor {
     public override void OnInspectorGUI() {
         base.OnInspectorGUI();
         
-        DungeonGenerator dungeonGenerator = (DungeonGenerator)target;
+        DungeonBuilder builder = (DungeonBuilder)target;
        
         if (GUILayout.Button("Generate Dungeon")) {
-            dungeonGenerator.StartDungeonGeneration();
+            builder.StartDungeonGeneration();
         }
 
         if (GUILayout.Button("Generate Doors")) {
-            dungeonGenerator.StartDoorGeneration();
+            builder.StartDoorGeneration();
         }
 
         if (GUILayout.Button("Generate Graph")) {
-            dungeonGenerator.StartGraphGeneration();
+            builder.StartGraphGeneration();
         }
 
-        if (GUILayout.Button("Start DFS")) {
-            dungeonGenerator.StartGraphSearch();
+        if (GUILayout.Button("Search Graph")) {
+            builder.StartGraphSearch();
         }
     }
 }

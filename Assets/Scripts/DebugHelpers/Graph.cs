@@ -96,7 +96,6 @@ public class Graph<T>
         while (Q.Count > 0)
         {
             v = Q.Dequeue();
-            Debug.Log(v);
             foreach (T w in GetNeighbors(v))
             {
                 if (!discovered.Contains(w))
@@ -123,7 +122,6 @@ public class Graph<T>
             if (!discovered.Contains(v))
             {
                 discovered.Add(v);
-                Debug.Log(v);
                 foreach (T w in GetNeighbors(v))
                 {
                     S.Push(w);
