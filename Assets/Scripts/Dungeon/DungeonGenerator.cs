@@ -4,58 +4,14 @@ using UnityEngine;
 
 public class DungeonGenerator 
 {
-    // [SerializeField] Vector2Int dungeonSize;
-    // [SerializeField] private Vector2Int minRoomSize;
-    // [SerializeField] private float timeBetweenOperations;
-    // [SerializeField] private GenerationType generationType;
-
-    // public enum GenerationType {
-    //     INSTANT,
-    //     TIMED,
-    //     KEYPRESS
-    // }
-    
     private readonly List<Room> _rooms = new();
     private readonly List<RectInt> _doors = new();
-    // private readonly Graph<Vector2> graph = new();
-    // private readonly List<Vector2> _nodes = new();
-    // private readonly HashSet<Vector2> _discoveredNodes = new();
 
     private DungeonBuilder.GenerationType _generationType;
     private float _timeBetweenOperations;
 
     public List<Room> Rooms => _rooms;
     public List<RectInt> Doors => _doors;
-    // public List<Vector2> Nodes { get { return _nodes; } }
-    // public HashSet<Vector2> DiscoveredNodes { get { return _discoveredNodes; } }
-
-    void Update() {
-        if (_rooms.Count == 0) return;
-
-        // foreach (Room room in _rooms) {
-        //     AlgorithmsUtils.DebugRectInt(room.Bounds, Color.red);
-        // }
-
-        // foreach (RectInt door in _doors) {
-        //     AlgorithmsUtils.DebugRectInt(door, Color.blue);
-        // }
-
-        // foreach (Vector2 node in _nodes) {
-        //     DebugExtension.DebugCircle(new Vector3(node.x, 0, node.y), Vector3.up, Color.green);
-            
-        //     foreach (Vector2 edge in graph.GetNeighbors(node)) {
-        //         Debug.DrawLine(new Vector3(node.x, 0, node.y), new Vector3(edge.x, 0, edge.y));
-        //     }
-        // }
-
-        // foreach (Vector2 node in _discoveredNodes) {
-        //     DebugExtension.DebugCircle(new Vector3(node.x, 0, node.y), Vector3.up, Color.blue);
-            
-        //     foreach (Vector2 edge in graph.GetNeighbors(node)) {
-        //         Debug.DrawLine(new Vector3(node.x, 0, node.y), new Vector3(edge.x, 0, edge.y), Color.blue);
-        //     }
-        // }
-    }
 
     public IEnumerator GenerateDungeon(Vector2Int dungeonSize, Vector2Int minRoomSize, DungeonGraph graph) {
         Room startRoom = new Room(new Vector2Int(0, 0), dungeonSize);
@@ -94,15 +50,6 @@ public class DungeonGenerator
                 if (_generationType != DungeonBuilder.GenerationType.INSTANT) yield return WaitForGeneration();
             }
         }
-
-        // foreach (Room r1 in _rooms) {
-        //     foreach (Room r2 in _rooms) {
-        //         if (r1 == r2) continue;
-        //         CreateDoor(r1.Bounds, r2.Bounds, graph);
-
-        //         if (_generationType != DungeonBuilder.GenerationType.INSTANT) yield return WaitForGeneration();
-        //     }
-        // }
 
         // I will revisit this i will make it better
         
@@ -159,27 +106,6 @@ public class DungeonGenerator
         graph.AddEdge(doorPosition, room2.center);
     }
 
-    // private void AddRoomNode(Room room) {
-    //     graph.AddNode(room.Bounds.center);
-    // }
-
-    // public IEnumerator GenerateGraph() {
-    //     foreach (Vector2 node in graph.GetNodes()) {
-    //         _nodes.Add(node);
-    //         if (_generationType != DungeonBuilder.GenerationType.INSTANT) yield return WaitForGeneration();
-    //     }
-    // }
-
-    // public IEnumerator SearchGraph() {
-    //     HashSet<Vector2> discovered = graph.BFS(graph.GetNodes()[0]);
-
-    //     foreach (Vector2 node in discovered) {
-    //         _discoveredNodes.Add(node);
-
-    //         if (_generationType != DungeonBuilder.GenerationType.INSTANT) yield return WaitForGeneration();
-    //     }
-    // }
-
     public void SetGenType(DungeonBuilder.GenerationType generationType, float timeBetweenOperations) {
         _generationType = generationType;
         _timeBetweenOperations = timeBetweenOperations;
@@ -196,24 +122,4 @@ public class DungeonGenerator
                 break;
         }
     }
-
-    // public void StartDungeonGeneration() {
-    //     StopAllCoroutines();
-    //     StartCoroutine(GenerateDungeon());
-    // }
-
-    // public void StartDoorGeneration() {
-    //     StopAllCoroutines();
-    //     StartCoroutine(GenerateDoors());
-    // }
-
-    // public void StartGraphGeneration() {
-    //     StopAllCoroutines();
-    //     StartCoroutine(GenerateGraph());
-    // }
-
-    // public void StartGraphSearch() {
-    //     StopAllCoroutines();
-    //     StartCoroutine(SearchGraph());
-    // }
 }
