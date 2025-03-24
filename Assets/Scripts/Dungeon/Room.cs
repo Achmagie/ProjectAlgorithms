@@ -27,7 +27,7 @@ public class Room
         this.size = size;
     }
 
-    public (Room room1, Room room2) Split(bool splitHorizontally, Vector2Int minRoomSize) {
+    public (Room room1, Room room2) Split(bool splitHorizontally, Vector2Int minRoomSize, System.Random rand) {
         if (splitHorizontally) {
             int minX = Position.x + minRoomSize.x;
             int maxX = Position.x + Size.x - minRoomSize.x;
@@ -35,11 +35,11 @@ public class Room
             if (minX >= maxX) {
                 if (!hasTriedToSplit) {
                     hasTriedToSplit = true;
-                    return Split(!splitHorizontally, minRoomSize);
+                    return Split(!splitHorizontally, minRoomSize, rand);
                 } else return (null, null);
             } 
 
-            int splitX = Random.Range(minX, maxX);
+            int splitX = rand.Next(minX, maxX + 1);
 
             Room room1 = new Room(Position, new Vector2Int(splitX - Position.x, Size.y));
             Room room2 = new Room(new Vector2Int(splitX - WALL_SIZE, Position.y), new Vector2Int(Position.x + Size.x - splitX + WALL_SIZE, Size.y));
@@ -52,11 +52,11 @@ public class Room
             if (minY >= maxY) {
                 if (!hasTriedToSplit) {
                     hasTriedToSplit = true;
-                    return Split(!splitHorizontally, minRoomSize);
+                    return Split(!splitHorizontally, minRoomSize, rand);
                 } else return (null, null);
             } 
 
-            int splitY = Random.Range(minY, maxY);
+            int splitY = rand.Next(minY, maxY + 1);
 
             Room room1 = new Room(Position, new Vector2Int(Size.x, splitY - Position.y));
             Room room2 = new Room(new Vector2Int(Position.x, splitY - WALL_SIZE), new Vector2Int(Size.x, Position.y + Size.y - splitY + WALL_SIZE));

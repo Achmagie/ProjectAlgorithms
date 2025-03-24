@@ -7,25 +7,27 @@ public class DungeonGenerator
     private readonly List<Room> _rooms = new();
     private readonly List<RectInt> _doors = new();
 
-    private DungeonBuilder.GenerationType _generationType;
-    private float _timeBetweenOperations;
-
     public List<Room> Rooms => _rooms;
     public List<RectInt> Doors => _doors;
 
-    public IEnumerator GenerateDungeon(Vector2Int dungeonSize, Vector2Int minRoomSize, DungeonGraph graph) {
+    private DungeonBuilder.GenerationType generationType;
+    private float timeBetweenOperations;
+
+    public IEnumerator GenerateDungeon(Vector2Int dungeonSize, Vector2Int minRoomSize, DungeonGraph graph, int seed) {
+        System.Random rand = new(seed);
+
         Room startRoom = new Room(new Vector2Int(0, 0), dungeonSize);
 
         _rooms.Clear();
         _rooms.Add(startRoom);
         
         Queue<(Room, bool)> roomQueue = new Queue<(Room, bool)>();
-        roomQueue.Enqueue((startRoom, Random.value > .5f));
+        roomQueue.Enqueue((startRoom, rand.Next(0, 2) == 1));
 
         while (roomQueue.Count > 0) {
             (Room room, bool splitHorizontally) = roomQueue.Dequeue();
             
-            (Room newRoom1, Room newRoom2) = room.Split(splitHorizontally, minRoomSize);
+            (Room newRoom1, Room newRoom2) = room.Split(splitHorizontally, minRoomSize, rand);
 
             if (newRoom1 == null && newRoom2 == null) continue;
 
@@ -35,7 +37,7 @@ public class DungeonGenerator
             roomQueue.Enqueue((newRoom1, splitHorizontally));
             roomQueue.Enqueue((newRoom2, !splitHorizontally));
 
-            if (_generationType != DungeonBuilder.GenerationType.INSTANT) yield return WaitForGeneration();
+            if (generationType != DungeonBuilder.GenerationType.INSTANT) yield return WaitForGeneration();
         }
 
         _rooms.ForEach(r => graph.AddNode(r.Bounds.center));
@@ -47,7 +49,7 @@ public class DungeonGenerator
         for (int i = 0; i < _rooms.Count; i++) {
             for (int j = i + 1; j < _rooms.Count; j++) {
                 CreateDoor(_rooms[i].Bounds, _rooms[j].Bounds, graph);
-                if (_generationType != DungeonBuilder.GenerationType.INSTANT) yield return WaitForGeneration();
+                if (generationType != DungeonBuilder.GenerationType.INSTANT) yield return WaitForGeneration();
             }
         }
 
@@ -107,14 +109,14 @@ public class DungeonGenerator
     }
 
     public void SetGenType(DungeonBuilder.GenerationType generationType, float timeBetweenOperations) {
-        _generationType = generationType;
-        _timeBetweenOperations = timeBetweenOperations;
+        this.generationType = generationType;
+        this.timeBetweenOperations = timeBetweenOperations;
     }
 
     private IEnumerator WaitForGeneration() {
-        switch (_generationType) {
+        switch (generationType) {
             case DungeonBuilder.GenerationType.TIMED:
-                yield return new WaitForSeconds(_timeBetweenOperations);
+                yield return new WaitForSeconds(timeBetweenOperations);
                 break;
             
             case DungeonBuilder.GenerationType.KEYPRESS:

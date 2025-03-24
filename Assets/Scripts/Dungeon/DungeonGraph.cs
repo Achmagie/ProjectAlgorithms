@@ -11,8 +11,8 @@ public class DungeonGraph
     public List<Vector2> Nodes => _nodes;
     public HashSet<Vector2> DiscoveredNodes => _discoveredNodes;
 
-    private DungeonBuilder.GenerationType _generationType;
-    private float _timeBetweenOperations;
+    private DungeonBuilder.GenerationType generationType;
+    private float timeBetweenOperations;
 
     public void AddNode(Vector2 node) {
         graph.AddNode(node);
@@ -25,7 +25,7 @@ public class DungeonGraph
     public IEnumerator GenerateGraph() {
         foreach (Vector2 node in graph.GetNodes()) {
             _nodes.Add(node);
-            if (_generationType != DungeonBuilder.GenerationType.INSTANT) yield return WaitForGeneration();
+            if (generationType != DungeonBuilder.GenerationType.INSTANT) yield return WaitForGeneration();
         }
     }
 
@@ -35,7 +35,7 @@ public class DungeonGraph
         foreach (Vector2 node in discovered) {
             _discoveredNodes.Add(node);
 
-            if (_generationType != DungeonBuilder.GenerationType.INSTANT) yield return WaitForGeneration();
+            if (generationType != DungeonBuilder.GenerationType.INSTANT) yield return WaitForGeneration();
         }
     }
 
@@ -44,15 +44,15 @@ public class DungeonGraph
     }
 
     public void SetGenType(DungeonBuilder.GenerationType generationType, float timeBetweenOperations) {
-        _generationType = generationType;
-        _timeBetweenOperations = timeBetweenOperations;
+        this.generationType = generationType;
+        this.timeBetweenOperations = timeBetweenOperations;
     }
 
 
     private IEnumerator WaitForGeneration() {
-        switch (_generationType) {
+        switch (generationType) {
             case DungeonBuilder.GenerationType.TIMED:
-                yield return new WaitForSeconds(_timeBetweenOperations);
+                yield return new WaitForSeconds(timeBetweenOperations);
                 break;
             
             case DungeonBuilder.GenerationType.KEYPRESS:

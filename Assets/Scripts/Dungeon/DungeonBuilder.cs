@@ -6,6 +6,7 @@ public class DungeonBuilder : MonoBehaviour
     [SerializeField] private Vector2Int minRoomSize;
     [SerializeField] private float timeBetweenOperations;
     [SerializeField] private GenerationType generationType;
+    [SerializeField] private int seed;
 
     public enum GenerationType {
         INSTANT,
@@ -33,7 +34,7 @@ public class DungeonBuilder : MonoBehaviour
 
     public void StartDungeonGeneration() {
         SetGenType();
-        StartCoroutine(generator.GenerateDungeon(dungeonSize, minRoomSize, graph));
+        StartCoroutine(generator.GenerateDungeon(dungeonSize, minRoomSize, graph, seed));
     }
 
     public void StartDoorGeneration() {
