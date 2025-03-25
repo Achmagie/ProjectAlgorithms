@@ -21,6 +21,7 @@ public class Room
     }
 
     public RectInt Bounds => new RectInt(position, size);
+    public float Area => size.x * size.y;
 
     public Room (Vector2Int position, Vector2Int size) {
         this.position = position;

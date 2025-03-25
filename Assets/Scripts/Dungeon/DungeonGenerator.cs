@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class DungeonGenerator 
@@ -41,6 +42,9 @@ public class DungeonGenerator
         }
 
         _rooms.ForEach(r => graph.AddNode(r.Bounds.center));
+
+        List<Room> smallestRooms = _rooms.OrderByDescending(r => r.Area).TakeLast((int)Mathf.Round(_rooms.Count * .1f)).ToList();
+        smallestRooms.ForEach(r => _rooms.Remove(r));
     }
 
     public IEnumerator GenerateDoors(DungeonGraph graph) {
