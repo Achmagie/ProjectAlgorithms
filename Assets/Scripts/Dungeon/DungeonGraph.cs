@@ -18,6 +18,10 @@ public class DungeonGraph
         graph.AddNode(node);
     }
 
+    public void RemoveNode(Vector2 node) {
+        graph.RemoveNode(node);
+    }
+
     public void AddEdge(Vector2 fromNode, Vector2 toNode) {
         graph.AddEdge(fromNode, toNode);
     }

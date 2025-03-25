@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
@@ -9,6 +10,8 @@ public class Room
     private bool hasTriedToSplit = false;
 
     private const int WALL_SIZE = 1;
+
+    private readonly List<RectInt> _doors = new();
 
     public Vector2Int Position { 
         get => position;
@@ -22,6 +25,8 @@ public class Room
 
     public RectInt Bounds => new RectInt(position, size);
     public float Area => size.x * size.y;
+
+    public List<RectInt> Doors => _doors;
 
     public Room (Vector2Int position, Vector2Int size) {
         this.position = position;
@@ -64,5 +69,9 @@ public class Room
 
             return (room1, room2);
         }
+    }
+
+    public void AddDoor(RectInt door) {
+        _doors.Add(door);
     }
 }

@@ -6,12 +6,19 @@ public class DungeonBuilder : MonoBehaviour
     [SerializeField] private Vector2Int minRoomSize;
     [SerializeField] private float timeBetweenOperations;
     [SerializeField] private GenerationType generationType;
+    [SerializeField] private PurgeType purgeType; 
     [SerializeField] private int seed;
 
     public enum GenerationType {
         INSTANT,
         TIMED,
         KEYPRESS
+    }
+
+    public enum PurgeType {
+        NONE,
+        TEN_PROCENT,
+        SPANNING_TREE
     }
 
     private DungeonGenerator generator;
@@ -34,21 +41,30 @@ public class DungeonBuilder : MonoBehaviour
 
     public void StartDungeonGeneration() {
         SetGenType();
+        StopAllCoroutines();
         StartCoroutine(generator.GenerateDungeon(dungeonSize, minRoomSize, graph, seed));
+    }
+
+    public void StartDungeonPurge() {
+        StopAllCoroutines();
+        StartCoroutine(generator.PurgeRooms(graph, purgeType));
     }
 
     public void StartDoorGeneration() {
         SetGenType();
+        StopAllCoroutines();
         StartCoroutine(generator.GenerateDoors(graph));
     }
 
     public void StartGraphGeneration() {
         SetGenType();
+        StopAllCoroutines();
         StartCoroutine(graph.GenerateGraph());
     }
 
     public void StartGraphSearch() {
         SetGenType();
+        StopAllCoroutines();
         StartCoroutine(graph.SearchGraph());
     }
 

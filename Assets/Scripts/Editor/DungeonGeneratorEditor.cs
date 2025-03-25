@@ -23,5 +23,9 @@ public class DungeonGeneratorEditor : Editor {
         if (GUILayout.Button("Search Graph")) {
             builder.StartGraphSearch();
         }
+
+        if (GUILayout.Button("Purge Dungeon")) {
+            builder.StartDungeonPurge();
+        }
     }
 }
