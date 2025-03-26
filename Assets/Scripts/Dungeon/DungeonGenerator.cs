@@ -45,8 +45,6 @@ public class DungeonGenerator
 
             if (generationType != DungeonBuilder.GenerationType.INSTANT) yield return WaitForGeneration();
         }
-
-        _rooms.ForEach(r => graph.AddNode(r.Bounds.center));
     }
 
     public IEnumerator GenerateDoors(DungeonGraph graph) {
@@ -110,10 +108,6 @@ public class DungeonGenerator
         RectInt door = new(doorPosition, new Vector2Int(1, 1));
 
         _doors.Add(door);
-        graph.AddNode(doorPosition);
-
-        graph.AddEdge(doorPosition, room1.Bounds.center);
-        graph.AddEdge(doorPosition, room2.Bounds.center);
 
         room1.AddDoor(door);
         room2.AddDoor(door);

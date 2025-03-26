@@ -26,7 +26,16 @@ public class DungeonGraph
         graph.AddEdge(fromNode, toNode);
     }
 
-    public IEnumerator GenerateGraph() {
+    public IEnumerator GenerateGraph(List<Room> rooms) {
+        foreach (Room room in rooms) {
+            graph.AddNode(room.Bounds.center);
+
+            foreach (RectInt door in room.Doors) {
+                graph.AddNode(door.position);
+                graph.AddEdge(door.position, room.Bounds.center);
+            }
+        }
+
         foreach (Vector2 node in graph.GetNodes()) {
             _nodes.Add(node);
             if (generationType != DungeonBuilder.GenerationType.INSTANT) yield return WaitForGeneration();

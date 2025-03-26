@@ -58,7 +58,7 @@ public class DungeonBuilder : MonoBehaviour
     public void StartGraphGeneration() {
         SetGenType();
         StopAllCoroutines();
-        StartCoroutine(graph.GenerateGraph());
+        StartCoroutine(graph.GenerateGraph(generator.Rooms));
     }
 
     public void StartGraphSearch() {
