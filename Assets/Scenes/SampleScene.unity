@@ -471,11 +471,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dungeonSize: {x: 100, y: 100}
-  minRoomSize: {x: 20, y: 20}
+  minRoomSize: {x: 10, y: 10}
   timeBetweenOperations: 0
   generationType: 0
   purgeType: 1
-  seed: 0
+  seed: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

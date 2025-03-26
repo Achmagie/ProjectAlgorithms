@@ -15,6 +15,10 @@ public class DungeonGenerator
 
     private float timeBetweenOperations;
 
+    private const int DOOR_SPACE = 4;
+    private const int DOOR_SEPARATION = 2;
+    
+
     public IEnumerator GenerateDungeon(Vector2Int dungeonSize, Vector2Int minRoomSize, DungeonGraph graph, int seed) {
         System.Random rand = new(seed);
 
@@ -95,15 +99,15 @@ public class DungeonGenerator
     private void CreateDoor(Room room1, Room room2, DungeonGraph graph) {
         RectInt intersection = AlgorithmsUtils.Intersect(room1.Bounds, room2.Bounds);
 
-        if (intersection.width <= 4 && intersection.height <= 4) return;
+        if (intersection.width <= DOOR_SPACE && intersection.height <= DOOR_SPACE) return;
 
         Vector2Int doorPosition;
 
-        if (intersection.width > 1) doorPosition = new Vector2Int(Random.Range(intersection.xMin + 2, intersection.xMin + intersection.width - 2), intersection.yMin);
-        else if (intersection.height > 1) doorPosition = new Vector2Int(intersection.xMin, Random.Range(intersection.yMin + 2, intersection.yMin + intersection.height - 2));
+        if (intersection.width > 1) doorPosition = new Vector2Int(Random.Range(intersection.xMin + DOOR_SEPARATION, intersection.xMin + intersection.width - DOOR_SEPARATION), intersection.yMin);
+        else if (intersection.height > 1) doorPosition = new Vector2Int(intersection.xMin, Random.Range(intersection.yMin + 2, intersection.yMin + intersection.height - DOOR_SEPARATION));
         else return;
 
-        RectInt door = new RectInt(doorPosition, new Vector2Int(1, 1));
+        RectInt door = new(doorPosition, new Vector2Int(1, 1));
 
         _doors.Add(door);
         graph.AddNode(doorPosition);
@@ -117,23 +121,83 @@ public class DungeonGenerator
 
     public IEnumerator PurgeRooms(DungeonGraph graph, DungeonBuilder.PurgeType purgeType) {
         switch (purgeType) {
-            case DungeonBuilder.PurgeType.TEN_PROCENT:
+            case DungeonBuilder.PurgeType.ROOMS:
                 List<Room> smallestRooms = _rooms.OrderByDescending(r => r.Area).Where(r => graph.GetNeighbors(r.Bounds.center).Count >= 2).TakeLast((int)Mathf.Ceil(_rooms.Count * .1f)).ToList();
                 
                 foreach (Room room in smallestRooms) {
-                    foreach (RectInt door in room.Doors) {
-                        _doors.Remove(door);
-                        graph.RemoveNode(door.position);
-                    }
-
                     _rooms.Remove(room);
                     graph.RemoveNode(room.Bounds.center);
+
+                    if (room.Doors.Count > 0) {
+                        foreach (RectInt door in room.Doors) {
+                            _doors.Remove(door);
+                            graph.RemoveNode(door.position);
+                        }
+                    }
 
                     yield return WaitForGeneration();
                 }
 
                 break;
+
+            case DungeonBuilder.PurgeType.DOORS:
+                List<Vector2> mst = new();
+                HashSet<Vector2> visitedRooms = new();
+                List<(Vector2 room, Vector2 door, int cost)> queue = new();
+
+                HashSet<Vector2> mstDoors = new();
+
+                Vector2 startRoom = _rooms[0].Bounds.center;
+                mst.Add(startRoom);
+                visitedRooms.Add(startRoom);
+
+                foreach (Vector2 door in graph.GetNeighbors(startRoom)) {
+                    foreach (Vector2 neighborRoom in graph.GetNeighbors(door)) {
+                        if (!visitedRooms.Contains(neighborRoom)) {
+                            int cost = graph.GetNeighbors(neighborRoom).Count;
+                            queue.Add((neighborRoom, door, cost));
+                        }
+                    }
+                }
+                
+                while (queue.Count > 0) {
+                    queue.Sort((a, b) => a.cost.CompareTo(b.cost));
+                    (var nextRoom, var connectingDoor, _) = queue[0];
+                    queue.RemoveAt(0);
+
+                    if (visitedRooms.Contains(nextRoom)) continue;
+
+                    mst.Add(nextRoom);
+                    visitedRooms.Add(nextRoom); 
+                    mstDoors.Add(connectingDoor);
+
+                    foreach (Vector2 door in graph.GetNeighbors(nextRoom)) {
+                        foreach (Vector2 neighborRoom in graph.GetNeighbors(door)) {
+                            if (!visitedRooms.Contains(neighborRoom)) {
+                                int cost = graph.GetNeighbors(neighborRoom).Count;
+                                queue.Add((neighborRoom, door, cost));
+                            }
+                        }
+                    }
+                }
+
+                List<Vector2> allDoors = graph.Nodes.Where(node => IsDoor(node)).ToList();
+                foreach (Vector2 door in allDoors) {
+                    if (!mstDoors.Contains(door)) {
+                        graph.RemoveNode(door);
+                        _doors.Remove(new RectInt(new Vector2Int((int)door.x, (int)door.y), new Vector2Int(1, 1)));
+                    }
+                }
+
+                graph.Nodes.Clear();
+                graph.Nodes.AddRange(mst);
+
+                break;
         }
+    }
+
+    private bool IsDoor(Vector2 node) {
+        return _doors.Any(d => d.position == node);
     }
 
     public void SetGenType(DungeonBuilder.GenerationType generationType, float timeBetweenOperations) {

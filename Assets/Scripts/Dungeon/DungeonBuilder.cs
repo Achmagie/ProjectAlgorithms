@@ -16,9 +16,8 @@ public class DungeonBuilder : MonoBehaviour
     }
 
     public enum PurgeType {
-        NONE,
-        TEN_PROCENT,
-        SPANNING_TREE
+        ROOMS,
+        DOORS
     }
 
     private DungeonGenerator generator;

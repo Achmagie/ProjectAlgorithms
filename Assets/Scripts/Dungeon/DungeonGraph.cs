@@ -52,7 +52,6 @@ public class DungeonGraph
         this.timeBetweenOperations = timeBetweenOperations;
     }
 
-
     private IEnumerator WaitForGeneration() {
         switch (generationType) {
             case DungeonBuilder.GenerationType.TIMED:
