@@ -113,21 +113,37 @@ public class DungeonGenerator
         room2.AddDoor(door);
     }
 
-    public IEnumerator PurgeRooms(DungeonGraph graph) {
-        List<Room> smallestRooms = _rooms.OrderByDescending(r => r.Area).Where(r => graph.GetNeighbors(r.Bounds.center).Count >= 2).TakeLast((int)Mathf.Ceil(_rooms.Count * .1f)).ToList();
+    public IEnumerator PurgeRooms() {
+        Graph<Room> roomGraph = new();
+        List<Room> smallestRooms = _rooms.OrderBy(r => r.Area).Take((int)Mathf.Ceil(_rooms.Count * 0.1f)).ToList();
         
         foreach (Room room in smallestRooms) {
-            _rooms.Remove(room);
-            graph.RemoveNode(room.Bounds.center);
+            List<(Room neighbor, RectInt door)> affectedNeighbors = new();
 
-            if (room.Doors.Count > 0) {
-                foreach (RectInt door in room.Doors) {
-                    _doors.Remove(door);
-                    graph.RemoveNode(door.position);
+            foreach (RectInt door in room.Doors) {
+                Room neighbor = GetConnectedRoom(door, room);
+                if (neighbor != null) {
+                    affectedNeighbors.Add((neighbor, door));
+                    neighbor.Doors.Remove(door);
                 }
+
+                _doors.Remove(door);    
             }
 
-            yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
+            _rooms.Remove(room);
+            room.Doors.Clear();
+
+            if (!IsDungeonConnected()) {
+                _rooms.Add(room);
+
+                foreach (var (neighbor, door) in affectedNeighbors) {
+                    neighbor.Doors.Add(door);
+                    _doors.Add(door);
+                }
+
+                room.Doors.AddRange(affectedNeighbors.Select(n => n.door));
+
+            } else yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
         }
     }
 
@@ -177,17 +193,46 @@ public class DungeonGenerator
             if (!mstDoors.Contains(door)) {
                 graph.RemoveNode(door);
                 _doors.Remove(new RectInt(new Vector2Int((int)door.x, (int)door.y), new Vector2Int(1, 1)));
-
-                yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
             }
         }
 
         graph.Nodes.Clear();
-        graph.Nodes.AddRange(mst);
+        
+        foreach (Vector2 node in mst) {
+            graph.Nodes.Add(node);
+            if (generationType != DungeonBuilder.GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
+        }
     }
 
     private bool IsDoor(Vector2 node) {
         return _doors.Any(d => d.position == node);
+    }
+
+    private bool IsDungeonConnected() {
+        if (_rooms.Count == 0) return false;
+
+        HashSet<Room> visited = new();
+        Stack<Room> stack = new();
+        
+        stack.Push(_rooms[0]);
+
+        while (stack.Count > 0) {
+            Room current = stack.Pop();
+            if (!visited.Add(current)) continue;
+
+            foreach (RectInt door in current.Doors) {
+                Room neighbor = _rooms.FirstOrDefault(r => r != current && r.Doors.Contains(door));
+                if (neighbor != null && !visited.Contains(neighbor)) {
+                    stack.Push(neighbor);
+                }
+            }
+        }
+
+        return visited.Count == _rooms.Count;
+    }
+
+    private Room GetConnectedRoom(RectInt door, Room currentRoom) {
+        return _rooms.FirstOrDefault(r => r != currentRoom && r.Doors.Contains(door));
     }
 
     public void SetGenType(DungeonBuilder.GenerationType generationType, float timeBetweenOperations) {

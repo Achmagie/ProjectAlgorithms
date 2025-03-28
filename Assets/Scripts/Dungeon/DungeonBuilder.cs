@@ -7,18 +7,12 @@ public class DungeonBuilder : MonoBehaviour
     [SerializeField] private Vector2Int minRoomSize;
     [SerializeField] private float timeBetweenOperations;
     [SerializeField] private GenerationType generationType;
-    [SerializeField] private PurgeType purgeType; 
     [SerializeField] private int seed;
 
     public enum GenerationType {
         INSTANT,
         TIMED,
         KEYPRESS
-    }
-
-    public enum PurgeType {
-        ROOMS,
-        DOORS
     }
 
     private readonly DungeonGenerator generator = new();
@@ -38,7 +32,7 @@ public class DungeonBuilder : MonoBehaviour
     }
 
     public void StartRoomPurge() {
-        StartProcess(generator.PurgeRooms(graph));
+        StartProcess(generator.PurgeRooms());
     }
 
     public void StartDoorPurge() {
