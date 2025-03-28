@@ -38,7 +38,7 @@ public class DungeonGraph
 
         foreach (Vector2 node in graph.GetNodes()) {
             _nodes.Add(node);
-            if (generationType != DungeonBuilder.GenerationType.INSTANT) yield return WaitForGeneration();
+            if (generationType != DungeonBuilder.GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
         }
     }
 
@@ -48,7 +48,7 @@ public class DungeonGraph
         foreach (Vector2 node in discovered) {
             _discoveredNodes.Add(node);
 
-            if (generationType != DungeonBuilder.GenerationType.INSTANT) yield return WaitForGeneration();
+            if (generationType != DungeonBuilder.GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
         }
     }
 
@@ -59,17 +59,5 @@ public class DungeonGraph
     public void SetGenType(DungeonBuilder.GenerationType generationType, float timeBetweenOperations) {
         this.generationType = generationType;
         this.timeBetweenOperations = timeBetweenOperations;
-    }
-
-    private IEnumerator WaitForGeneration() {
-        switch (generationType) {
-            case DungeonBuilder.GenerationType.TIMED:
-                yield return new WaitForSeconds(timeBetweenOperations);
-                break;
-            
-            case DungeonBuilder.GenerationType.KEYPRESS:
-                yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
-                break;
-        }
     }
 }

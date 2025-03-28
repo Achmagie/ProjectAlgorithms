@@ -1,28 +1,21 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class DungeonPainter
 {
-    private DungeonGenerator generator;
-    private DungeonGraph graph;
-
-    public DungeonPainter(DungeonGenerator dungeonGenerator, DungeonGraph dungeonGraph) {
-        generator = dungeonGenerator;
-        graph = dungeonGraph;
-    }
-
-    public void PaintRooms(Color color) {
-        foreach (Room room in generator.Rooms) {
+    public void PaintRooms(List<Room> rooms, Color color) {
+        foreach (Room room in rooms) {
             AlgorithmsUtils.DebugRectInt(room.Bounds, color);
         }
     }
 
-    public void PaintDoors(Color color) {
-        foreach (RectInt door in generator.Doors) {
+    public void PaintDoors(List<RectInt> doors, Color color) {
+        foreach (RectInt door in doors) {
             AlgorithmsUtils.DebugRectInt(door, color);
         }
     } 
 
-    public void PaintGraph(Color nodeColor, Color colorLine) {
+    public void PaintGraph(DungeonGraph graph, Color nodeColor, Color colorLine) {
         foreach (Vector2 node in graph.Nodes) {
             DebugExtension.DebugCircle(new Vector3(node.x, 0, node.y), Vector3.up, nodeColor);
             
@@ -32,7 +25,7 @@ public class DungeonPainter
         }
     }
 
-    public void PaintPath(Color nodeColor, Color colorLine) {
+    public void PaintPath(DungeonGraph graph, Color nodeColor, Color colorLine) {
         foreach (Vector2 node in graph.DiscoveredNodes) {
             DebugExtension.DebugCircle(new Vector3(node.x, 0, node.y), Vector3.up, nodeColor);
             

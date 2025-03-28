@@ -15,17 +15,21 @@ public class DungeonGeneratorEditor : Editor {
         if (GUILayout.Button("Generate Doors")) {
             builder.StartDoorGeneration();
         }
+        
+        if (GUILayout.Button("Purge Rooms")) {
+            builder.StartRoomPurge();
+        }
 
         if (GUILayout.Button("Generate Graph")) {
             builder.StartGraphGeneration();
         }
 
-        if (GUILayout.Button("Search Graph")) {
-            builder.StartGraphSearch();
+        if (GUILayout.Button("Purge Doors")) {
+            builder.StartDoorPurge();
         }
 
-        if (GUILayout.Button("Purge Dungeon")) {
-            builder.StartDungeonPurge();
+        if (GUILayout.Button("Search Graph")) {
+            builder.StartGraphSearch();
         }
     }
 }

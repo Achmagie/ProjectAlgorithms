@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class DungeonBuilder : MonoBehaviour
@@ -20,55 +21,50 @@ public class DungeonBuilder : MonoBehaviour
         DOORS
     }
 
-    private DungeonGenerator generator;
-    private DungeonGraph graph;
-    private DungeonPainter painter;
-
-    private void Awake() {
-        generator = new DungeonGenerator();
-        graph = new DungeonGraph();
-        painter = new DungeonPainter(generator, graph);
-    }
+    private readonly DungeonGenerator generator = new();
+    private readonly DungeonGraph graph = new();
+    private readonly DungeonPainter painter = new();
 
     private void Update() {
-        painter.PaintRooms(Color.red);
-        painter.PaintDoors(Color.blue);
+        painter.PaintRooms(generator.Rooms, Color.red);
+        painter.PaintDoors(generator.Doors, Color.blue);
 
-        painter.PaintGraph(Color.green, Color.white);
-        painter.PaintPath(Color.blue, Color.blue);
+        painter.PaintGraph(graph, Color.green, Color.white);
+        painter.PaintPath(graph, Color.blue, Color.blue);
     }
 
     public void StartDungeonGeneration() {
-        SetGenType();
-        StopAllCoroutines();
-        StartCoroutine(generator.GenerateDungeon(dungeonSize, minRoomSize, graph, seed));
+        StartProcess(generator.GenerateDungeon(dungeonSize, minRoomSize, seed));
     }
 
-    public void StartDungeonPurge() {
-        StopAllCoroutines();
-        StartCoroutine(generator.PurgeRooms(graph, purgeType));
+    public void StartRoomPurge() {
+        StartProcess(generator.PurgeRooms(graph));
+    }
+
+    public void StartDoorPurge() {
+        StartProcess(generator.PurgeDoors(graph));
     }
 
     public void StartDoorGeneration() {
-        SetGenType();
-        StopAllCoroutines();
-        StartCoroutine(generator.GenerateDoors(graph));
+        StartProcess(generator.GenerateDoors());
     }
 
     public void StartGraphGeneration() {
-        SetGenType();
-        StopAllCoroutines();
-        StartCoroutine(graph.GenerateGraph(generator.Rooms));
+        StartProcess(graph.GenerateGraph(generator.Rooms));
     }
 
     public void StartGraphSearch() {
-        SetGenType();
-        StopAllCoroutines();
-        StartCoroutine(graph.SearchGraph());
+        StartProcess(graph.SearchGraph());
     }
 
     private void SetGenType() {
         generator.SetGenType(generationType, timeBetweenOperations);
         graph.SetGenType(generationType, timeBetweenOperations);
+    }
+
+    private void StartProcess(IEnumerator routine) {
+        SetGenType();
+        StopAllCoroutines();
+        StartCoroutine(routine);
     }
 }
