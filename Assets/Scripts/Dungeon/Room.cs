@@ -33,7 +33,6 @@ public class Room
         this.size = size;
     }
 
-
     /// <summary>
     /// Splits the current room into two smaller rooms either horizontally or vertically, making sure that each room is at least minimum size
     /// If split direction is invalid it tries the opposite direction

@@ -40,7 +40,7 @@ public class DungeonBuilder : MonoBehaviour
     }
 
     public void StartDoorGeneration() {
-        StartProcess(generator.GenerateDoors());
+        StartProcess(generator.GenerateDoors(seed));
     }
 
     public void StartGraphGeneration() {
