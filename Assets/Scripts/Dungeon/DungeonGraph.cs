@@ -26,6 +26,11 @@ public class DungeonGraph
         graph.AddEdge(fromNode, toNode);
     }
 
+    /// <summary>
+    /// Creates a graph representation of the dungeon by adding nodes for each room and door and connecting them with edges
+    /// </summary>
+    /// <param name="rooms"></param>
+    /// <returns>Yields execution based on generation type</returns>
     public IEnumerator GenerateGraph(List<Room> rooms) {
         foreach (Room room in rooms) {
             graph.AddNode(room.Bounds.center);
@@ -42,6 +47,10 @@ public class DungeonGraph
         }
     }
 
+    /// <summary>
+    /// Gets the discovered nodes from running breadth first search and adds them to list of discovered nodes
+    /// </summary>
+    /// <returns>Yields execution based on generation type</returns>
     public IEnumerator SearchGraph() {
         HashSet<Vector2> discovered = graph.BFS(graph.GetNodes()[0]);
 

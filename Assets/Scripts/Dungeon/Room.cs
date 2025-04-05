@@ -33,6 +33,15 @@ public class Room
         this.size = size;
     }
 
+
+    /// <summary>
+    /// Splits the current room into two smaller rooms either horizontally or vertically, making sure that each room is at least minimum size
+    /// If split direction is invalid it tries the opposite direction
+    /// </summary>
+    /// <param name="splitHorizontally">Checks whether to attempt a horizontal split first, if not tries vertical</param>
+    /// <param name="minRoomSize">The minimum size for each resulting room</param>
+    /// <param name="rand">Random number generator used to determine split position</param>
+    /// <returns></returns>
     public (Room room1, Room room2) Split(bool splitHorizontally, Vector2Int minRoomSize, System.Random rand) {
         if (splitHorizontally) {
             int minX = Position.x + minRoomSize.x;

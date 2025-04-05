@@ -19,15 +19,24 @@ public class DungeonGenerator
     private const int DOOR_SEPARATION = 2;
     
 
+    /// <summary>
+    /// Generates a dungeon layout using binary space partitioning
+    /// The dungeon is split into rooms until all rooms meet the minimum size requirements
+    /// The process is randomized using the provided seed
+    /// </summary>
+    /// <param name="dungeonSize">Total size of the dungeon</param>
+    /// <param name="minRoomSize">Minimum size a room has to be</param>
+    /// <param name="seed">The value used to randomize room splitting</param>
+    /// <returns>Yields execution based on generation type</returns>
     public IEnumerator GenerateDungeon(Vector2Int dungeonSize, Vector2Int minRoomSize, int seed) {
         System.Random rand = new(seed);
 
-        Room startRoom = new Room(new Vector2Int(0, 0), dungeonSize);
+        Room startRoom = new(new Vector2Int(0, 0), dungeonSize);
 
         _rooms.Clear();
         _rooms.Add(startRoom);
         
-        Queue<(Room, bool)> roomQueue = new Queue<(Room, bool)>();
+        Queue<(Room, bool)> roomQueue = new();
         roomQueue.Enqueue((startRoom, rand.Next(0, 2) == 1));
 
         while (roomQueue.Count > 0) {
@@ -47,6 +56,10 @@ public class DungeonGenerator
         }
     }
 
+    /// <summary>
+    /// Attempts to create doors between all pairs of rooms in the dungeon
+    /// </summary>
+    /// <returns>Yields execution based on generation type</returns>
     public IEnumerator GenerateDoors() {
         _doors.Clear();
 
@@ -94,6 +107,12 @@ public class DungeonGenerator
         // }
     }
 
+    /// <summary>
+    /// Creates a door between two rooms if they intersect
+    /// A door is placed randomly within the overlapping area
+    /// </summary>
+    /// <param name="room1"></param>
+    /// <param name="room2"></param>
     private void CreateDoor(Room room1, Room room2) {
         RectInt intersection = AlgorithmsUtils.Intersect(room1.Bounds, room2.Bounds);
 
@@ -113,8 +132,12 @@ public class DungeonGenerator
         room2.AddDoor(door);
     }
 
+    /// <summary>
+    /// Removes the smallest 10% of rooms from the dungeon while ensuring the dungeon remains fully connected
+    /// If removing a room breaks dungeon connectivity, the room and its connections are restored
+    /// </summary>
+    /// <returns>Yields execution based on generation type</returns>
     public IEnumerator PurgeRooms() {
-        Graph<Room> roomGraph = new();
         List<Room> smallestRooms = _rooms.OrderBy(r => r.Area).Take((int)Mathf.Ceil(_rooms.Count * 0.1f)).ToList();
         
         foreach (Room room in smallestRooms) {
@@ -147,11 +170,40 @@ public class DungeonGenerator
         }
     }
 
+    /// <summary>
+    /// Removes unnecessary doors from the dungeon using a minimum spanning tree algorithm to ensure full connectivity
+    /// </summary>
+    /// <param name="graph">The dungeon graph for rooms and door connections</param>
+    /// <returns></returns>
     public IEnumerator PurgeDoors(DungeonGraph graph) {
+        (HashSet<Vector2> mstDoors, List<Vector2> mst) = PrimMST(graph);
+
+        List<Vector2> allDoors = graph.Nodes.Where(node => IsDoor(node)).ToList();
+        foreach (Vector2 door in allDoors) {
+            if (!mstDoors.Contains(door)) {
+                graph.RemoveNode(door);
+                _doors.Remove(new RectInt(new Vector2Int((int)door.x, (int)door.y), new Vector2Int(1, 1)));
+            }
+        }
+
+        graph.Nodes.Clear();
+        
+        foreach (Vector2 node in mst) {
+            graph.Nodes.Add(node);
+            if (generationType != DungeonBuilder.GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
+        }
+    }
+
+    /// <summary>
+    /// https://www.geeksforgeeks.org/prims-minimum-spanning-tree-mst-greedy-algo-5/
+    /// </summary>
+    /// <param name="graph">The dungeon graph for rooms and door connections</param>
+    /// <returns>All doors present in the minimum spanning tree as well as the minimum spanning tree</returns>
+    private (HashSet<Vector2>, List<Vector2>) PrimMST(DungeonGraph graph) {
         List<Vector2> mst = new();
         HashSet<Vector2> visitedRooms = new();
         List<(Vector2 room, Vector2 door, int cost)> queue = new();
-
+        
         HashSet<Vector2> mstDoors = new();
 
         Vector2 startRoom = _rooms[0].Bounds.center;
@@ -188,32 +240,21 @@ public class DungeonGenerator
             }
         }
 
-        List<Vector2> allDoors = graph.Nodes.Where(node => IsDoor(node)).ToList();
-        foreach (Vector2 door in allDoors) {
-            if (!mstDoors.Contains(door)) {
-                graph.RemoveNode(door);
-                _doors.Remove(new RectInt(new Vector2Int((int)door.x, (int)door.y), new Vector2Int(1, 1)));
-            }
-        }
-
-        graph.Nodes.Clear();
-        
-        foreach (Vector2 node in mst) {
-            graph.Nodes.Add(node);
-            if (generationType != DungeonBuilder.GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
-        }
+        return (mstDoors, mst);
     }
 
+    // Checks if given node is present in list of doors
     private bool IsDoor(Vector2 node) {
         return _doors.Any(d => d.position == node);
     }
 
+    // Uses a modified DFS algorithm to check if the dungeon is still fully connected
     private bool IsDungeonConnected() {
         if (_rooms.Count == 0) return false;
 
         HashSet<Room> visited = new();
         Stack<Room> stack = new();
-        
+
         stack.Push(_rooms[0]);
 
         while (stack.Count > 0) {
@@ -228,9 +269,10 @@ public class DungeonGenerator
             }
         }
 
-        return visited.Count == _rooms.Count;
+        return visited.Count == _rooms.Count; 
     }
 
+    // Gets connected rooms through the given door
     private Room GetConnectedRoom(RectInt door, Room currentRoom) {
         return _rooms.FirstOrDefault(r => r != currentRoom && r.Doors.Contains(door));
     }
