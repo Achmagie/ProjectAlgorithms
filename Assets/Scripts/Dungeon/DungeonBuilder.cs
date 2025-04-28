@@ -43,22 +43,32 @@ public class DungeonBuilder : MonoBehaviour
 
     private IEnumerator SpawnWalls() {
         HashSet<Vector3> wallPositions = new();
+        HashSet<Vector3> doorPositions = generator.Doors.Select(d => new Vector3(d.position.x, 0, d.position.y)).ToHashSet();
 
-        foreach (Room room in generator.Rooms) {
+        foreach (Room room in generator.Rooms) {            
             for (int i = 0; i < room.Size.x; i++) {
-                wallPositions.Add(new Vector3(room.Position.x + SPAWN_OFFSET + i, 0, room.Position.y + SPAWN_OFFSET)); 
-                wallPositions.Add(new Vector3(room.Position.x + SPAWN_OFFSET + i, 0, room.Position.y - SPAWN_OFFSET + room.Size.y)); 
+                Vector3 wallBottom = new(room.Position.x + i, 0, room.Position.y);
+                Vector3 wallTop = new(room.Position.x + i, 0, room.Position.y + room.Size.y);
+
+                if (doorPositions.Contains(wallBottom) || doorPositions.Contains(wallTop)) Debug.Log("DOOR");
+
+                if (!doorPositions.Contains(wallBottom)) wallPositions.Add(wallBottom + new Vector3(SPAWN_OFFSET, 0, SPAWN_OFFSET));
+                if (!doorPositions.Contains(wallTop)) wallPositions.Add(wallTop + new Vector3(SPAWN_OFFSET, 0, -SPAWN_OFFSET));
             }
 
             for (int j = 0; j < room.Size.y; j++) {
-                wallPositions.Add(new Vector3(room.Position.x + SPAWN_OFFSET, 0, room.Position.y + SPAWN_OFFSET + j)); 
-                wallPositions.Add(new Vector3(room.Position.x - SPAWN_OFFSET + room.Size.x, 0, room.Position.y + SPAWN_OFFSET + j));
+                Vector3 wallLeft = new(room.Position.x, 0, room.Position.y + j);
+                Vector3 wallRight = new(room.Position.x + room.Size.x, 0, room.Position.y + j);
+
+                if (doorPositions.Contains(wallLeft) || doorPositions.Contains(wallRight)) Debug.Log("DOOR");
+
+                if (!doorPositions.Contains(wallLeft)) wallPositions.Add(wallLeft + new Vector3(SPAWN_OFFSET, 0, SPAWN_OFFSET));
+                if (!doorPositions.Contains(wallRight)) wallPositions.Add(wallRight + new Vector3(-SPAWN_OFFSET, 0, SPAWN_OFFSET));
             }
         }
 
         foreach (Vector3 wallPos in wallPositions) {
             Instantiate(wallPrefab, wallPos, Quaternion.identity);
-
             if (generationType != GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
         }
     }
