@@ -31,5 +31,9 @@ public class DungeonGeneratorEditor : Editor {
         if (GUILayout.Button("Search Graph")) {
             builder.StartGraphSearch();
         }
+
+        if (GUILayout.Button("Spawn Walls")) {
+            builder.StartSpawnWalls();
+        }
     }
 }

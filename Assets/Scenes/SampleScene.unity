@@ -470,12 +470,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d279c2cf9dc8e8d438c9c9f7238378d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dungeonSize: {x: 100, y: 100}
-  minRoomSize: {x: 10, y: 10}
-  timeBetweenOperations: 0
-  generationType: 0
-  purgeType: 1
+  dungeonSize: {x: 20, y: 20}
+  minRoomSize: {x: 5, y: 5}
   seed: 1
+  timeBetweenOperations: 0.02
+  generationType: 0
+  wallPrefab: {fileID: 2281183335213533343, guid: 8a6f882c14ef04c449c34690671af6b0, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

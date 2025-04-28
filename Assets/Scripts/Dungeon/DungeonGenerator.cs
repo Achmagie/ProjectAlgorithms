@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class DungeonGenerator
 {
@@ -55,6 +56,12 @@ public class DungeonGenerator
             if (generationType != DungeonBuilder.GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
         }
     }
+
+    // private IEnumerator SpawnWalls(Room room, GameObject wallPrefab) {
+    //     for (int i = 0; i < room.Size.x; i++) {
+    //         Instantiate
+    //     }
+    // }
 
     /// <summary>
     /// Attempts to create doors between all pairs of rooms in the dungeon
