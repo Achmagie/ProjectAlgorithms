@@ -470,8 +470,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d279c2cf9dc8e8d438c9c9f7238378d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dungeonSize: {x: 20, y: 20}
-  minRoomSize: {x: 5, y: 5}
+  dungeonSize: {x: 50, y: 50}
+  minRoomSize: {x: 9, y: 9}
   seed: 1
   timeBetweenOperations: 0.02
   generationType: 0
