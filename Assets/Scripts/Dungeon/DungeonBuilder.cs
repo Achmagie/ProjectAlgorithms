@@ -15,6 +15,7 @@ public class DungeonBuilder : MonoBehaviour
     [SerializeField] private GenerationType generationType;
 
     [Header("Spawn Assets")]
+    [SerializeField] private GameObject roomParent;
     [SerializeField] private GameObject wallPrefab;
 
     private const float SPAWN_OFFSET = 0.5f;
@@ -42,15 +43,16 @@ public class DungeonBuilder : MonoBehaviour
     }
 
     private IEnumerator SpawnWalls() {
-        HashSet<Vector3> wallPositions = new();
         HashSet<Vector3> doorPositions = generator.Doors.Select(d => new Vector3(d.position.x, 0, d.position.y)).ToHashSet();
 
-        Vector3 wallBottomOffset = new Vector3(SPAWN_OFFSET, 0, SPAWN_OFFSET);
-        Vector3 wallTopOffset = new Vector3(SPAWN_OFFSET, 0, -SPAWN_OFFSET);
-        Vector3 wallLeftOffset = new Vector3(SPAWN_OFFSET, 0, SPAWN_OFFSET);
-        Vector3 wallRightOffset = new Vector3(-SPAWN_OFFSET, 0, SPAWN_OFFSET);
+        Vector3 wallBottomOffset = new(SPAWN_OFFSET, 0, SPAWN_OFFSET);
+        Vector3 wallTopOffset = new(SPAWN_OFFSET, 0, -SPAWN_OFFSET);
+        Vector3 wallLeftOffset = new(SPAWN_OFFSET, 0, SPAWN_OFFSET);
+        Vector3 wallRightOffset = new(-SPAWN_OFFSET, 0, SPAWN_OFFSET);
 
-        foreach (Room room in generator.Rooms) {            
+        foreach (Room room in generator.Rooms) {        
+            HashSet<Vector3> wallPositions = new();
+
             for (int i = 0; i < room.Size.x; i++) {
                 Vector3 wallBottom = new(room.Position.x + i, 0, room.Position.y);
                 Vector3 wallTop = new(room.Position.x + i, 0, room.Position.y + room.Size.y);
@@ -66,13 +68,18 @@ public class DungeonBuilder : MonoBehaviour
                 wallPositions.Add(wallLeft + wallLeftOffset);
                 wallPositions.Add(wallRight + wallRightOffset);
             }
-        }
 
-        foreach (Vector3 wallPos in wallPositions) {
-            if (doorPositions.Contains(wallPos - wallBottomOffset) || doorPositions.Contains(wallPos - wallLeftOffset)) continue; 
+            GameObject wallParent = new("Room_" + room.Position + "_" + room.Size);
+            wallParent.transform.parent = roomParent.transform;
 
-            Instantiate(wallPrefab, wallPos, Quaternion.identity);
-            if (generationType != GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
+            foreach (Vector3 wallPos in wallPositions) {
+                if (doorPositions.Contains(wallPos - wallBottomOffset) || doorPositions.Contains(wallPos - wallLeftOffset)) continue; 
+
+                GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.identity, wallParent.transform);
+                wall.name = "Wall_" + wall.transform.position;  
+
+                if (generationType != GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
+            }
         }
     }
 
