@@ -17,6 +17,7 @@ public class DungeonBuilder : MonoBehaviour
     [Header("Spawn Assets")]
     [SerializeField] private GameObject roomParent;
     [SerializeField] private GameObject wallPrefab;
+    [SerializeField] private GameObject floorPrefab;
 
     private const float SPAWN_OFFSET = 0.5f;
 
@@ -71,6 +72,9 @@ public class DungeonBuilder : MonoBehaviour
 
             GameObject wallParent = new("Room_" + room.Position + "_" + room.Size);
             wallParent.transform.parent = roomParent.transform;
+
+            GameObject floor = Instantiate(floorPrefab, new Vector3(room.Bounds.center.x, 0, room.Bounds.center.y), floorPrefab.transform.rotation, wallParent.transform);
+            floor.transform.localScale = new Vector3(room.Size.x, room.Size.y, 1);
 
             foreach (Vector3 wallPos in wallPositions) {
                 if (doorPositions.Contains(wallPos - wallBottomOffset) || doorPositions.Contains(wallPos - wallLeftOffset)) continue; 
