@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.AI.Navigation;
 using UnityEngine;
 
 public class DungeonBuilder : MonoBehaviour
@@ -18,6 +19,8 @@ public class DungeonBuilder : MonoBehaviour
     [SerializeField] private GameObject roomParent;
     [SerializeField] private GameObject wallPrefab;
     [SerializeField] private GameObject floorPrefab;
+
+    [SerializeField] private NavMeshSurface navMeshSurface;
 
     private const float SPAWN_OFFSET = 0.5f;
 
@@ -109,6 +112,10 @@ public class DungeonBuilder : MonoBehaviour
 
     public void StartGraphSearch() {
         StartProcess(graph.SearchGraph());
+    }
+
+    public void BakeNavMesh() {
+        generator.BakeNavMesh(navMeshSurface);
     }
 
     private void SetGenType() {

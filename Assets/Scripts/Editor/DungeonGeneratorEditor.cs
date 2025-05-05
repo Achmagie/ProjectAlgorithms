@@ -35,5 +35,9 @@ public class DungeonGeneratorEditor : Editor {
         if (GUILayout.Button("Spawn Walls")) {
             builder.StartSpawnWalls();
         }
+
+        if (GUILayout.Button("Bake Mesh")) {
+            builder.BakeNavMesh();
+        }
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -55,6 +56,10 @@ public class DungeonGenerator
 
             if (generationType != DungeonBuilder.GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
         }
+    }
+
+    public void BakeNavMesh(NavMeshSurface navMeshSurface) {
+        navMeshSurface.BuildNavMesh();
     }
 
     // private IEnumerator SpawnWalls(Room room, GameObject wallPrefab) {
