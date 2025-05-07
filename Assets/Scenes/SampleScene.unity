@@ -507,6 +507,7 @@ MonoBehaviour:
   timeBetweenOperations: 0.02
   generationType: 0
   roomParent: {fileID: 746318140}
+  floorParent: {fileID: 2013827503}
   tilePrefabs:
   - {fileID: 6814929800619760735, guid: fba88c40ec270bf40af90b2aa2b42702, type: 3}
   - {fileID: 3774274519178469602, guid: 7ef9d9aeef7c9a04baaef1374ffa8429, type: 3}
@@ -524,7 +525,7 @@ MonoBehaviour:
   - {fileID: 5731869865940351114, guid: 3bda3f3a84bd8594cb66869d3c1d1207, type: 3}
   - {fileID: 108691694519890301, guid: 674d3a1d918513d409418f4e2fb6f114, type: 3}
   - {fileID: 6814929800619760735, guid: fba88c40ec270bf40af90b2aa2b42702, type: 3}
-  floorPrefab: {fileID: 5917521704511971607, guid: 611e77d39f296484aab0ce8b5d618528, type: 3}
+  floorPrefab: {fileID: 2725551949418779679, guid: 3f812c5b5ec306a44aa691da9408d814, type: 3}
   navMeshSurface: {fileID: 1926828067}
 --- !u!1 &1926828066
 GameObject:
@@ -734,6 +735,37 @@ NavMeshAgent:
   m_BaseOffset: 0.5
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!1 &2013827503
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2013827504}
+  m_Layer: 0
+  m_Name: Floors
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2013827504
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2013827503}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -743,5 +775,6 @@ SceneRoots:
   - {fileID: 832575519}
   - {fileID: 1514706324}
   - {fileID: 746318141}
+  - {fileID: 2013827504}
   - {fileID: 1926828068}
   - {fileID: 1962395035}

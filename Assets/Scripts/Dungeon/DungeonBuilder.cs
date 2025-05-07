@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.AI.Navigation;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class DungeonBuilder : MonoBehaviour
@@ -17,6 +18,7 @@ public class DungeonBuilder : MonoBehaviour
 
     [Header("Spawn Assets")]
     [SerializeField] private GameObject roomParent;
+    [SerializeField] private GameObject floorParent;
     [SerializeField] private List<GameObject> tilePrefabs;
     [SerializeField] private GameObject floorPrefab;
 
@@ -46,7 +48,11 @@ public class DungeonBuilder : MonoBehaviour
     }
 
     public void StartSpawnWalls() {
-        StartCoroutine(SpawnWalls());
+        StartCoroutine(SpawnTiles());
+    }
+
+    public void StartSpawnFloor() {
+        StartCoroutine(SpawnFloor(0, 0));
     }
 
     // private IEnumerator SpawnWalls() {
@@ -93,35 +99,14 @@ public class DungeonBuilder : MonoBehaviour
     //     }
     // }
 
-    private IEnumerator SpawnWalls() {
-        // for (int y = 0; y < _tileMap.GetLength(0) - 1; y++) {
-        //     for (int x = 0; x < _tileMap.GetLength(1) - 1; x++) {
-        //         var bottomLeft = _tileMap[y, x];
-        //         var bottomRight = _tileMap[y, x + 1];
-        //         var topLeft = _tileMap[y + 1, x];
-        //         var topRight = _tileMap[y + 1, x + 1];
-
-        //         int tileCase = bottomRight + 2 * topRight + 4 * topLeft + 8 * bottomLeft;
-
-        //         GameObject tile = tilePrefabs[tileCase];
-
-        //         Instantiate(tile, new Vector3(x + SPAWN_OFFSET, 0, y + SPAWN_OFFSET), tile.transform.rotation); 
-        //         if (generationType != GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
-        //     }
-        // }
-
+    private IEnumerator SpawnTiles() {
         foreach (Room room in generator.Rooms) {
             GameObject tileParent = new("Room_" + room.Position + "_" + room.Size);
             tileParent.transform.parent = roomParent.transform;
 
             for (int y = room.Position.y; y < room.Position.y + room.Size.y - 1; y++) {
                 for (int x = room.Position.x; x < room.Position.x + room.Size.x - 1; x++) {
-                    var bottomLeft = _tileMap[y, x];
-                    var bottomRight = _tileMap[y, x + 1];
-                    var topLeft = _tileMap[y + 1, x];
-                    var topRight = _tileMap[y + 1, x + 1];
-
-                    int tileCase = bottomRight + 2 * topRight + 4 * topLeft + 8 * bottomLeft;
+                    int tileCase = CalculateTileCase(x, y);
 
                     GameObject tile = tilePrefabs[tileCase];
 
@@ -132,6 +117,56 @@ public class DungeonBuilder : MonoBehaviour
                 }
             }
         }   
+    }
+
+    private IEnumerator SpawnFloor(int startY, int startX) {        
+        int height = _tileMap.GetLength(0);
+        int width = _tileMap.GetLength(1);
+        bool[,] visited = new bool[height, width];
+        Queue<Vector2Int> tileQ = new();
+
+        tileQ.Enqueue(new Vector2Int(startX, startY));
+        visited[startY, startX] = true;
+
+        while (tileQ.Count > 0) {
+            Vector2Int currentTile = tileQ.Dequeue();
+            int x = currentTile.x;
+            int y = currentTile.y;
+
+            if (y < 0 || y >= height - 1 || x < 0 || x >= width - 1) continue;
+
+            GameObject tileType = tilePrefabs[CalculateTileCase(x, y)];
+
+            if (tileType.CompareTag("Filler")) Instantiate(floorPrefab, new Vector3(x + SPAWN_OFFSET, 0, y + SPAWN_OFFSET), floorPrefab.transform.rotation, floorParent.transform);
+
+            if (generationType != GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
+
+            Vector2Int[] dir = {
+                new(x, y + 1),
+                new(x, y - 1),
+                new(x + 1, y),
+                new(x - 1, y)
+            };
+
+            foreach (var next in dir) {
+                int nx = next.x;
+                int ny = next.y;
+
+                if (ny >= 0 && ny < height - 1 && nx >= 0 && nx < width - 1 && !visited[ny, nx]) {
+                    visited[ny, nx] = true;
+                    tileQ.Enqueue(next);
+                }
+            }
+        }
+    }
+
+    private int CalculateTileCase(int x, int y) {
+        var bottomLeft = _tileMap[y, x];
+        var bottomRight = _tileMap[y, x + 1];
+        var topLeft = _tileMap[y + 1, x];
+        var topRight = _tileMap[y + 1, x + 1];
+
+        return bottomRight + 2 * topRight + 4 * topLeft + 8 * bottomLeft;
     }
 
     public void StartDungeonGeneration() {
