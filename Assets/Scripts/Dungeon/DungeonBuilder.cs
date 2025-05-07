@@ -33,6 +33,7 @@ public class DungeonBuilder : MonoBehaviour
     private readonly DungeonGenerator generator = new();
     private readonly DungeonGraph graph = new();
     private readonly DungeonPainter painter = new();
+    private readonly TileMapGenerator tileMapGenerator = new();
 
     private void Update() {
         painter.PaintRooms(generator.Rooms, Color.red);
@@ -112,6 +113,14 @@ public class DungeonBuilder : MonoBehaviour
 
     public void StartGraphSearch() {
         StartProcess(graph.SearchGraph());
+    }
+
+    public void GenerateTileMap() {
+        tileMapGenerator.GenerateTileMap(dungeonSize, generator.Rooms, generator.Doors);
+    }
+
+    public void PrintTileMap() {
+        tileMapGenerator.PrintTileMap();
     }
 
     public void BakeNavMesh() {
