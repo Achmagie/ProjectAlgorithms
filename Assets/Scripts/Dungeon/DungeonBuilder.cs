@@ -24,7 +24,7 @@ public class DungeonBuilder : MonoBehaviour
 
     private int [,] _tileMap;
 
-    private const float SPAWN_OFFSET = 0.5f;
+    private const float SPAWN_OFFSET = 1f;
 
     public enum GenerationType {
         INSTANT,
@@ -94,21 +94,44 @@ public class DungeonBuilder : MonoBehaviour
     // }
 
     private IEnumerator SpawnWalls() {
-        for (int y = 0; y < _tileMap.GetLength(0) - 1; y++) {
-            for (int x = 0; x < _tileMap.GetLength(1) - 1; x++) {
-                var bottomLeft = _tileMap[y, x];
-                var bottomRight = _tileMap[y, x + 1];
-                var topLeft = _tileMap[y + 1, x];
-                var topRight = _tileMap[y + 1, x + 1];
+        // for (int y = 0; y < _tileMap.GetLength(0) - 1; y++) {
+        //     for (int x = 0; x < _tileMap.GetLength(1) - 1; x++) {
+        //         var bottomLeft = _tileMap[y, x];
+        //         var bottomRight = _tileMap[y, x + 1];
+        //         var topLeft = _tileMap[y + 1, x];
+        //         var topRight = _tileMap[y + 1, x + 1];
 
-                int tileCase = bottomRight + 2 * topRight + 4 * topLeft + 8 * bottomLeft;
+        //         int tileCase = bottomRight + 2 * topRight + 4 * topLeft + 8 * bottomLeft;
 
-                GameObject tile = tilePrefabs[tileCase];
+        //         GameObject tile = tilePrefabs[tileCase];
 
-                Instantiate(tile, new Vector3(x, 0, y), tile.transform.rotation); 
-                if (generationType != GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
+        //         Instantiate(tile, new Vector3(x + SPAWN_OFFSET, 0, y + SPAWN_OFFSET), tile.transform.rotation); 
+        //         if (generationType != GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
+        //     }
+        // }
+
+        foreach (Room room in generator.Rooms) {
+            GameObject tileParent = new("Room_" + room.Position + "_" + room.Size);
+            tileParent.transform.parent = roomParent.transform;
+
+            for (int y = room.Position.y; y < room.Position.y + room.Size.y - 1; y++) {
+                for (int x = room.Position.x; x < room.Position.x + room.Size.x - 1; x++) {
+                    var bottomLeft = _tileMap[y, x];
+                    var bottomRight = _tileMap[y, x + 1];
+                    var topLeft = _tileMap[y + 1, x];
+                    var topRight = _tileMap[y + 1, x + 1];
+
+                    int tileCase = bottomRight + 2 * topRight + 4 * topLeft + 8 * bottomLeft;
+
+                    GameObject tile = tilePrefabs[tileCase];
+
+                    tile = Instantiate(tile, new Vector3(x + SPAWN_OFFSET, 0, y + SPAWN_OFFSET), tile.transform.rotation, tileParent.transform); 
+                    tile.name = "Tile_" + tile.transform.position;
+
+                    if (generationType != GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
+                }
             }
-        }
+        }   
     }
 
     public void StartDungeonGeneration() {
