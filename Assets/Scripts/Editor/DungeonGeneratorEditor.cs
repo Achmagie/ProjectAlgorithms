@@ -32,16 +32,16 @@ public class DungeonGeneratorEditor : Editor {
             builder.StartGraphSearch();
         }
 
-        if (GUILayout.Button("Spawn Walls")) {
-            builder.StartSpawnWalls();
-        }
-
         if (GUILayout.Button("Generate TileMap")) {
             builder.GenerateTileMap();
         }
 
         if (GUILayout.Button("Print TileMap")) {
             builder.PrintTileMap();
+        }
+
+        if (GUILayout.Button("Spawn Walls")) {
+            builder.StartSpawnWalls();
         }
 
         if (GUILayout.Button("Bake Mesh")) {

@@ -6,7 +6,7 @@ public class TileMapGenerator
 {
     private int [,] _tileMap;
 
-    public void GenerateTileMap(Vector2Int dungeonSize, List<Room> rooms, List<RectInt> doors) {
+    public int [,] GenerateTileMap(Vector2Int dungeonSize, List<Room> rooms, List<RectInt> doors) {
         int [,] tileMap = new int[dungeonSize.y, dungeonSize.x];
         int rows = tileMap.GetLength(0);
         int cols = tileMap.GetLength(1);
@@ -34,6 +34,8 @@ public class TileMapGenerator
         }
 
         _tileMap = tileMap;
+
+        return tileMap;
     }
 
     private string ToString(bool flip) {

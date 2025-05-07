@@ -17,10 +17,12 @@ public class DungeonBuilder : MonoBehaviour
 
     [Header("Spawn Assets")]
     [SerializeField] private GameObject roomParent;
-    [SerializeField] private GameObject wallPrefab;
+    [SerializeField] private List<GameObject> tilePrefabs;
     [SerializeField] private GameObject floorPrefab;
 
     [SerializeField] private NavMeshSurface navMeshSurface;
+
+    private int [,] _tileMap;
 
     private const float SPAWN_OFFSET = 0.5f;
 
@@ -47,45 +49,63 @@ public class DungeonBuilder : MonoBehaviour
         StartCoroutine(SpawnWalls());
     }
 
+    // private IEnumerator SpawnWalls() {
+    //     HashSet<Vector3> doorPositions = generator.Doors.Select(d => new Vector3(d.position.x, 0, d.position.y)).ToHashSet();
+
+    //     Vector3 wallBottomOffset = new(SPAWN_OFFSET, 0, SPAWN_OFFSET);
+    //     Vector3 wallTopOffset = new(SPAWN_OFFSET, 0, -SPAWN_OFFSET);
+    //     Vector3 wallLeftOffset = new(SPAWN_OFFSET, 0, SPAWN_OFFSET);
+    //     Vector3 wallRightOffset = new(-SPAWN_OFFSET, 0, SPAWN_OFFSET);
+
+    //     foreach (Room room in generator.Rooms) {        
+    //         HashSet<Vector3> wallPositions = new();
+
+    //         for (int i = 0; i < room.Size.x; i++) {
+    //             Vector3 wallBottom = new(room.Position.x + i, 0, room.Position.y);
+    //             Vector3 wallTop = new(room.Position.x + i, 0, room.Position.y + room.Size.y);
+
+    //             wallPositions.Add(wallBottom + wallBottomOffset);
+    //             wallPositions.Add(wallTop + wallTopOffset);
+    //         }
+
+    //         for (int j = 0; j < room.Size.y; j++) {
+    //             Vector3 wallLeft = new(room.Position.x, 0, room.Position.y + j);
+    //             Vector3 wallRight = new(room.Position.x + room.Size.x, 0, room.Position.y + j);
+
+    //             wallPositions.Add(wallLeft + wallLeftOffset);
+    //             wallPositions.Add(wallRight + wallRightOffset);
+    //         }
+
+    //         GameObject wallParent = new("Room_" + room.Position + "_" + room.Size);
+    //         wallParent.transform.parent = roomParent.transform;
+
+    //         GameObject floor = Instantiate(floorPrefab, new Vector3(room.Bounds.center.x, 0, room.Bounds.center.y), floorPrefab.transform.rotation, wallParent.transform);
+    //         floor.transform.localScale = new Vector3(room.Size.x, room.Size.y, 1);
+
+    //         foreach (Vector3 wallPos in wallPositions) {
+    //             if (doorPositions.Contains(wallPos - wallBottomOffset) || doorPositions.Contains(wallPos - wallLeftOffset)) continue; 
+
+    //             // GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.identity, wallParent.transform);
+    //             // wall.name = "Wall_" + wall.transform.position;  
+
+    //             if (generationType != GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
+    //         }
+    //     }
+    // }
+
     private IEnumerator SpawnWalls() {
-        HashSet<Vector3> doorPositions = generator.Doors.Select(d => new Vector3(d.position.x, 0, d.position.y)).ToHashSet();
+        for (int y = 0; y < _tileMap.GetLength(0) - 1; y++) {
+            for (int x = 0; x < _tileMap.GetLength(1) - 1; x++) {
+                var bottomLeft = _tileMap[y, x];
+                var bottomRight = _tileMap[y, x + 1];
+                var topLeft = _tileMap[y + 1, x];
+                var topRight = _tileMap[y + 1, x + 1];
 
-        Vector3 wallBottomOffset = new(SPAWN_OFFSET, 0, SPAWN_OFFSET);
-        Vector3 wallTopOffset = new(SPAWN_OFFSET, 0, -SPAWN_OFFSET);
-        Vector3 wallLeftOffset = new(SPAWN_OFFSET, 0, SPAWN_OFFSET);
-        Vector3 wallRightOffset = new(-SPAWN_OFFSET, 0, SPAWN_OFFSET);
+                int tileCase = bottomRight + 2 * topRight + 4 * topLeft + 8 * bottomLeft;
 
-        foreach (Room room in generator.Rooms) {        
-            HashSet<Vector3> wallPositions = new();
+                GameObject tile = tilePrefabs[tileCase];
 
-            for (int i = 0; i < room.Size.x; i++) {
-                Vector3 wallBottom = new(room.Position.x + i, 0, room.Position.y);
-                Vector3 wallTop = new(room.Position.x + i, 0, room.Position.y + room.Size.y);
-
-                wallPositions.Add(wallBottom + wallBottomOffset);
-                wallPositions.Add(wallTop + wallTopOffset);
-            }
-
-            for (int j = 0; j < room.Size.y; j++) {
-                Vector3 wallLeft = new(room.Position.x, 0, room.Position.y + j);
-                Vector3 wallRight = new(room.Position.x + room.Size.x, 0, room.Position.y + j);
-
-                wallPositions.Add(wallLeft + wallLeftOffset);
-                wallPositions.Add(wallRight + wallRightOffset);
-            }
-
-            GameObject wallParent = new("Room_" + room.Position + "_" + room.Size);
-            wallParent.transform.parent = roomParent.transform;
-
-            GameObject floor = Instantiate(floorPrefab, new Vector3(room.Bounds.center.x, 0, room.Bounds.center.y), floorPrefab.transform.rotation, wallParent.transform);
-            floor.transform.localScale = new Vector3(room.Size.x, room.Size.y, 1);
-
-            foreach (Vector3 wallPos in wallPositions) {
-                if (doorPositions.Contains(wallPos - wallBottomOffset) || doorPositions.Contains(wallPos - wallLeftOffset)) continue; 
-
-                GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.identity, wallParent.transform);
-                wall.name = "Wall_" + wall.transform.position;  
-
+                Instantiate(tile, new Vector3(x, 0, y), tile.transform.rotation); 
                 if (generationType != GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
             }
         }
@@ -116,7 +136,7 @@ public class DungeonBuilder : MonoBehaviour
     }
 
     public void GenerateTileMap() {
-        tileMapGenerator.GenerateTileMap(dungeonSize, generator.Rooms, generator.Doors);
+        _tileMap = tileMapGenerator.GenerateTileMap(dungeonSize, generator.Rooms, generator.Doors);
     }
 
     public void PrintTileMap() {

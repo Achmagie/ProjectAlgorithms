@@ -206,7 +206,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0.20612314, y: -0, z: -0, w: 0.97852606}
-  m_LocalPosition: {x: 30, y: 39.3, z: -31.09}
+  m_LocalPosition: {x: 36.23, y: 39.3, z: -31.09}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -507,7 +507,23 @@ MonoBehaviour:
   timeBetweenOperations: 0.02
   generationType: 0
   roomParent: {fileID: 746318140}
-  wallPrefab: {fileID: 2281183335213533343, guid: 8a6f882c14ef04c449c34690671af6b0, type: 3}
+  tilePrefabs:
+  - {fileID: 6814929800619760735, guid: fba88c40ec270bf40af90b2aa2b42702, type: 3}
+  - {fileID: 3774274519178469602, guid: 7ef9d9aeef7c9a04baaef1374ffa8429, type: 3}
+  - {fileID: 5298627271709729432, guid: 18b6c8f89153da946b3f1b5052e0610e, type: 3}
+  - {fileID: 6348950793226748418, guid: fa795c5082091cf42a629cca0de4c8d2, type: 3}
+  - {fileID: 4713416412009891256, guid: dc8969b4e8b94c2478daa94e7c3d0daf, type: 3}
+  - {fileID: 6814929800619760735, guid: fba88c40ec270bf40af90b2aa2b42702, type: 3}
+  - {fileID: 8257499734766656862, guid: 7cfd3ba80d352664fbf19dc40dd2ac05, type: 3}
+  - {fileID: 7733947271305367903, guid: fea942888edbbd842bb923b6184a352b, type: 3}
+  - {fileID: 726669515694956201, guid: 01b0111d792a9a34aa789967462e6f23, type: 3}
+  - {fileID: 3853875981616952739, guid: 912a5821cd39688429a814849b29b294, type: 3}
+  - {fileID: 6814929800619760735, guid: fba88c40ec270bf40af90b2aa2b42702, type: 3}
+  - {fileID: 682114933734146487, guid: 2417dbc225e35254ab0a473e95105595, type: 3}
+  - {fileID: 5177321908794668881, guid: c5c50567f1477e745a2bddd3c7795464, type: 3}
+  - {fileID: 5731869865940351114, guid: 3bda3f3a84bd8594cb66869d3c1d1207, type: 3}
+  - {fileID: 108691694519890301, guid: 674d3a1d918513d409418f4e2fb6f114, type: 3}
+  - {fileID: 6814929800619760735, guid: fba88c40ec270bf40af90b2aa2b42702, type: 3}
   floorPrefab: {fileID: 5917521704511971607, guid: 611e77d39f296484aab0ce8b5d618528, type: 3}
   navMeshSurface: {fileID: 1926828067}
 --- !u!1 &1926828066
