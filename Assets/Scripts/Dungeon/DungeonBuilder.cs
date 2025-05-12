@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.AI.Navigation;
+using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -52,7 +53,8 @@ public class DungeonBuilder : MonoBehaviour
     }
 
     public void StartSpawnFloor() {
-        StartCoroutine(SpawnFloor(0, 0));
+        Room startRoom = generator.Rooms[UnityEngine.Random.Range(0, generator.Rooms.Count - 1)];
+        StartCoroutine(SpawnFloor(new Vector2Int((int)startRoom.Bounds.center.x, (int)startRoom.Bounds.center.y)));
     }
 
     // private IEnumerator SpawnWalls() {
@@ -119,42 +121,81 @@ public class DungeonBuilder : MonoBehaviour
         }   
     }
 
-    private IEnumerator SpawnFloor(int startY, int startX) {        
+    // private IEnumerator SpawnFloor(int startY, int startX) {        
+    //     int height = _tileMap.GetLength(0);
+    //     int width = _tileMap.GetLength(1);
+    //     bool[,] visited = new bool[height, width];
+    //     Queue<Vector2Int> tileQ = new();
+
+    //     tileQ.Enqueue(new Vector2Int(startX, startY));
+    //     visited[startY, startX] = true;
+
+    //     while (tileQ.Count > 0) {
+    //         Vector2Int currentTile = tileQ.Dequeue();
+    //         int x = currentTile.x;
+    //         int y = currentTile.y;
+
+    //         if (y < 0 || y >= height - 1 || x < 0 || x >= width - 1) continue;
+
+            // GameObject tileType = tilePrefabs[CalculateTileCase(x, y)];
+
+            // if (tileType.CompareTag("Filler")) Instantiate(floorPrefab, new Vector3(x + SPAWN_OFFSET, 0, y + SPAWN_OFFSET), floorPrefab.transform.rotation, floorParent.transform);
+
+    //         if (generationType != GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
+
+    //         Vector2Int[] dir = {
+    //             new(x, y + 1),
+    //             new(x, y - 1),
+    //             new(x + 1, y),
+    //             new(x - 1, y)
+    //         };
+
+    //         foreach (var next in dir) {
+    //             int nx = next.x;
+    //             int ny = next.y;
+
+    //             if (ny >= 0 && ny < height - 1 && nx >= 0 && nx < width - 1 && !visited[ny, nx]) {
+    //                 visited[ny, nx] = true;
+    //                 tileQ.Enqueue(next);
+    //             }
+    //         }
+    //     }
+    // }
+    
+    private IEnumerator SpawnFloor(Vector2Int startPoint) {        
+        int oldTile = _tileMap[startPoint.y, startPoint.x];
+
+        if (oldTile == 1) yield break;
+
         int height = _tileMap.GetLength(0);
         int width = _tileMap.GetLength(1);
-        bool[,] visited = new bool[height, width];
+
         Queue<Vector2Int> tileQ = new();
 
-        tileQ.Enqueue(new Vector2Int(startX, startY));
-        visited[startY, startX] = true;
+        tileQ.Enqueue(startPoint);
+
+        _tileMap[startPoint.y, startPoint.x] = 1;
+
+        Instantiate(floorPrefab, new Vector3(startPoint.x + SPAWN_OFFSET, 0, startPoint.y + SPAWN_OFFSET), floorPrefab.transform.rotation, floorParent.transform);
+
+        int[] dx = { -1, 1, 0, 0 };
+        int[] dy = { 0, 0, -1, 1};
 
         while (tileQ.Count > 0) {
-            Vector2Int currentTile = tileQ.Dequeue();
-            int x = currentTile.x;
-            int y = currentTile.y;
+            Vector2Int tile = tileQ.Dequeue();
 
-            if (y < 0 || y >= height - 1 || x < 0 || x >= width - 1) continue;
+            for (int i = 0; i < 4; i++) {
+                int nx = tile.x + dx[i];
+                int ny = tile.y + dy[i];
 
-            GameObject tileType = tilePrefabs[CalculateTileCase(x, y)];
+                if (nx >= 0 && nx < height && ny >= 0 && ny < width && _tileMap[nx, ny] == 0) {
+                    _tileMap[nx, ny] = 1;
 
-            if (tileType.CompareTag("Filler")) Instantiate(floorPrefab, new Vector3(x + SPAWN_OFFSET, 0, y + SPAWN_OFFSET), floorPrefab.transform.rotation, floorParent.transform);
+                    Instantiate(floorPrefab, new Vector3(ny + SPAWN_OFFSET, 0, nx + SPAWN_OFFSET), floorPrefab.transform.rotation, floorParent.transform);
 
-            if (generationType != GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
+                    if (generationType != GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
 
-            Vector2Int[] dir = {
-                new(x, y + 1),
-                new(x, y - 1),
-                new(x + 1, y),
-                new(x - 1, y)
-            };
-
-            foreach (var next in dir) {
-                int nx = next.x;
-                int ny = next.y;
-
-                if (ny >= 0 && ny < height - 1 && nx >= 0 && nx < width - 1 && !visited[ny, nx]) {
-                    visited[ny, nx] = true;
-                    tileQ.Enqueue(next);
+                    tileQ.Enqueue(new Vector2Int(nx, ny));
                 }
             }
         }
