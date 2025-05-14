@@ -527,6 +527,7 @@ MonoBehaviour:
   - {fileID: 6814929800619760735, guid: fba88c40ec270bf40af90b2aa2b42702, type: 3}
   floorPrefab: {fileID: 2725551949418779679, guid: 3f812c5b5ec306a44aa691da9408d814, type: 3}
   navMeshSurface: {fileID: 1926828067}
+  path: []
 --- !u!1 &1926828066
 GameObject:
   m_ObjectHideFlags: 0
@@ -713,6 +714,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f350c634bcb97446a0f6b15ccf8165e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 5
+  pathFinder: {fileID: 1514706325}
 --- !u!195 &1962395037
 NavMeshAgent:
   m_ObjectHideFlags: 0
