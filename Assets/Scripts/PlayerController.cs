@@ -5,15 +5,19 @@ using UnityEngine.AI;
 
 public class PlayerController : MonoBehaviour
 {    
-    [SerializeField]
-    private float speed = 5f;
+    [SerializeField] private float speed = 5f;
+    [SerializeField] private TraversalType traversalType;
+    [SerializeField] private PathFinder pathFinder;
     
     private bool isMoving = false;
 
     private Vector3 clickPosition;
     private NavMeshAgent navMeshAgent;
 
-    public DungeonBuilder pathFinder;
+    public enum TraversalType {
+        ASTAR,
+        NAVMESH
+    }
 
     private void Awake() {
         navMeshAgent = GetComponent<NavMeshAgent>();
@@ -25,8 +29,15 @@ public class PlayerController : MonoBehaviour
             if (Physics.Raycast(mouseRay, out RaycastHit hitInfo)) {
                 clickPosition = hitInfo.point;
 
-                navMeshAgent.SetDestination(clickPosition);
-                GoToDestination(clickPosition);
+                switch (traversalType) {
+                    case TraversalType.ASTAR:
+                        GoToDestination(clickPosition);
+                        break;
+                    
+                    case TraversalType.NAVMESH:
+                        if (navMeshAgent.isOnNavMesh) navMeshAgent.SetDestination(clickPosition);
+                        break;
+                }
             }
         }
 

@@ -1,55 +1,55 @@
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(DungeonBuilder))]
+[CustomEditor(typeof(DungeonManager))]
 public class DungeonGeneratorEditor : Editor {
     public override void OnInspectorGUI() {
         base.OnInspectorGUI();
         
-        DungeonBuilder builder = (DungeonBuilder)target;
+        DungeonManager manager = (DungeonManager)target;
        
         if (GUILayout.Button("Generate Dungeon")) {
-            builder.StartDungeonGeneration();
+            manager.StartDungeonGeneration();
         }
 
         if (GUILayout.Button("Generate Doors")) {
-            builder.StartDoorGeneration();
+            manager.StartDoorGeneration();
         }
         
         if (GUILayout.Button("Purge Rooms")) {
-            builder.StartRoomPurge();
+            manager.StartRoomPurge();
         }
 
         if (GUILayout.Button("Generate Graph")) {
-            builder.StartGraphGeneration();
+            manager.StartGraphGeneration();
         }
 
         if (GUILayout.Button("Purge Doors")) {
-            builder.StartDoorPurge();
+            manager.StartDoorPurge();
         }
 
         if (GUILayout.Button("Search Graph")) {
-            builder.StartGraphSearch();
+            manager.StartGraphSearch();
         }
 
         if (GUILayout.Button("Generate TileMap")) {
-            builder.GenerateTileMap();
+            manager.GenerateTileMap();
         }
 
         if (GUILayout.Button("Print TileMap")) {
-            builder.PrintTileMap();
+            manager.PrintTileMap();
         }
 
-        if (GUILayout.Button("Spawn Walls")) {
-            builder.StartSpawnWalls();
+        if (GUILayout.Button("Spawn Tiles")) {
+            manager.SpawnTiles();
         }
 
         if (GUILayout.Button("Spawn Floor")) {
-            builder.StartSpawnFloor();
+            manager.SpawnFloor();
         }
 
         if (GUILayout.Button("Bake Mesh")) {
-            builder.BakeNavMesh();
+            manager.BakeNavMesh();
         }
     }
 }

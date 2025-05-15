@@ -5,14 +5,9 @@ using UnityEngine;
 public class DungeonGraph
 {
     private readonly Graph<Vector2> graph = new();
-    private readonly List<Vector2> _nodes = new();
-    private readonly HashSet<Vector2> _discoveredNodes = new();
 
-    public List<Vector2> Nodes => _nodes;
-    public HashSet<Vector2> DiscoveredNodes => _discoveredNodes;
-
-    private DungeonBuilder.GenerationType generationType;
-    private float timeBetweenOperations;
+    public List<Vector2> Nodes { get; private set; } = new();
+    public HashSet<Vector2> DiscoveredNodes { get; private set; } = new();
 
     public void AddNode(Vector2 node) {
         graph.AddNode(node);
@@ -42,8 +37,8 @@ public class DungeonGraph
         }
 
         foreach (Vector2 node in graph.GetNodes()) {
-            _nodes.Add(node);
-            if (generationType != DungeonBuilder.GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
+            Nodes.Add(node);
+            if (DungeonProcessor.Instance.GenerationType != DungeonProcessor.ProcessingType.INSTANT) yield return DungeonProcessor.Instance.WaitForGeneration();
         }
     }
 
@@ -55,18 +50,13 @@ public class DungeonGraph
         HashSet<Vector2> discovered = graph.BFS(graph.GetNodes()[0]);
 
         foreach (Vector2 node in discovered) {
-            _discoveredNodes.Add(node);
+            DiscoveredNodes.Add(node);
 
-            if (generationType != DungeonBuilder.GenerationType.INSTANT) yield return GenerationHelper.WaitForGeneration(generationType, timeBetweenOperations);
+            if (DungeonProcessor.Instance.GenerationType != DungeonProcessor.ProcessingType.INSTANT) yield return DungeonProcessor.Instance.WaitForGeneration();
         }
     }
 
     public List<Vector2> GetNeighbors(Vector2 node) {
         return graph.GetNeighbors(node);
-    }
-
-    public void SetGenType(DungeonBuilder.GenerationType generationType, float timeBetweenOperations) {
-        this.generationType = generationType;
-        this.timeBetweenOperations = timeBetweenOperations;
     }
 }

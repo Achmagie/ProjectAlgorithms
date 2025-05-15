@@ -7,16 +7,20 @@ public class PathFinder : MonoBehaviour
     private Vector3 startNode;
     private Vector3 endNode;
     
-    public List<Vector3> path = new();
-    HashSet<Vector3> discovered = new();
+    private List<Vector3> path = new();
+    private HashSet<Vector3> discovered = new();
     
-    private Graph<Vector3> graph;
+    private Graph<Vector3> _graph;
+
+    public void SetGraph(Graph<Vector3> graph) {
+        _graph = graph;
+    }
 
     private Vector3 GetClosestNodeToPosition(Vector3 position) {
         Vector3 closestNode = Vector3.zero;
         float closestDistance = Mathf.Infinity;
         
-        foreach(Vector3 node in graph.GetNodes()) {
+        foreach(Vector3 node in _graph.GetNodes()) {
             if ((node - position).magnitude < closestDistance) {
                 closestDistance = (node - position).magnitude;
                 closestNode = node;
@@ -56,7 +60,7 @@ public class PathFinder : MonoBehaviour
 
             if (node == end) return ReconstructPath(path, start, end);
 
-            foreach(Vector3 neighbor in graph.GetNeighbors(node)) {
+            foreach(Vector3 neighbor in _graph.GetNeighbors(node)) {
                 float newCost = cost[node] + Cost(node, neighbor);
                 if (!cost.ContainsKey(neighbor) || newCost < cost[neighbor]) {
                     cost[neighbor] = newCost;
