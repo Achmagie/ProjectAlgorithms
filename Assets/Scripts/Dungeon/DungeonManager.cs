@@ -1,6 +1,10 @@
 using Unity.AI.Navigation;
 using UnityEngine;
 
+
+/// <summary>
+/// Facade for all dungeon functionality that the user is allowed to interact with
+/// </summary>
 public class DungeonManager : MonoBehaviour
 {
     [Header("Dungeon Params")]
@@ -71,7 +75,7 @@ public class DungeonManager : MonoBehaviour
 
     public void SpawnFloor() {
         Room startRoom = generator.Rooms[Random.Range(0, generator.Rooms.Count - 1)];
-        StartCoroutine(builder.SpawnFloor(new Vector2Int((int)startRoom.Bounds.center.x, (int)startRoom.Bounds.center.y), tileMap));
+        builder.SpawnFloor(new Vector2Int((int)startRoom.Bounds.center.x, (int)startRoom.Bounds.center.y), tileMap);
     }
 
     public void BakeNavMesh() {

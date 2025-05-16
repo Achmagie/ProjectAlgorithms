@@ -6,6 +6,13 @@ public class TileMapGenerator
 {
     private int [,] _tileMap;
 
+    /// <summary>
+    /// Generates a tilemap based on a given dungeon and its rooms and doors
+    /// </summary>
+    /// <param name="dungeonSize">The size of the dungeon</param>
+    /// <param name="rooms">List of rooms in dungeon</param>
+    /// <param name="doors">List of doors in dungeon</param>
+    /// <returns></returns>
     public int [,] GenerateTileMap(Vector2Int dungeonSize, List<Room> rooms, List<RectInt> doors) {
         int [,] tileMap = new int[dungeonSize.y, dungeonSize.x];
         int rows = tileMap.GetLength(0);
@@ -38,6 +45,11 @@ public class TileMapGenerator
         return tileMap;
     }
 
+    /// <summary>
+    /// Prints the tilemap to the console for debug purposes
+    /// </summary>
+    /// <param name="flip"></param>
+    /// <returns></returns>
     private string ToString(bool flip) {
         if (_tileMap == null) return "Tile map not generated yet.";
         

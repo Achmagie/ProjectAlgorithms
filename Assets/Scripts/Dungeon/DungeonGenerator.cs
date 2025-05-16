@@ -23,7 +23,7 @@ public class DungeonGenerator
     /// The process is randomized using the provided seed
     /// </summary>
     /// <param name="dungeonSize">Total size of the dungeon</param>
-    /// <param name="minRoomSize">Minimum size a room has to be</param>
+    /// <param name="minimumRoomSize">Minimum size a room has to be</param>
     /// <param name="seed">The value used to randomize room splitting</param>
     /// <returns>Yields execution based on generation type</returns>
     public IEnumerator GenerateDungeon(Vector2Int dungeonSize, Vector2Int minimumRoomSize, int seed) {
@@ -162,7 +162,6 @@ public class DungeonGenerator
     /// <summary>
     /// https://www.geeksforgeeks.org/prims-minimum-spanning-tree-mst-greedy-algo-5/
     /// </summary>
-    /// <param name="graph">The dungeon graph for rooms and door connections</param>
     /// <returns>All doors present in the minimum spanning tree as well as the minimum spanning tree</returns>
     private (HashSet<Vector2>, List<Vector2>) PrimMST() {
         List<Vector2> mst = new();

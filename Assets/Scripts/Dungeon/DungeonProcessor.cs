@@ -22,6 +22,10 @@ public class DungeonProcessor : MonoBehaviour
         Instance = this;
     }
 
+    /// <summary>
+    /// Used for consistent dungeon generation at runtime
+    /// </summary>
+    /// <returns></returns>
     public IEnumerator WaitForGeneration() {
         switch (GenerationType) {
             case ProcessingType.TIMED:
