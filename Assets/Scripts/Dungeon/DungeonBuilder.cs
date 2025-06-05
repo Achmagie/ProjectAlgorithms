@@ -40,7 +40,7 @@ public class DungeonBuilder : MonoBehaviour
         }   
     }
 
-    //BFS VERSION (works better but i needed to have a recursive one)
+    //BFS VERSION (like this one better but i needed to have a recursive one)
 
     // public IEnumerator SpawnFloor(Vector2Int startPoint, int[,] tileMap) {
     //     Graph<Vector3> traversalGraph = new();
@@ -56,11 +56,12 @@ public class DungeonBuilder : MonoBehaviour
     //     tileQ.Enqueue(startPoint);
     //     tileMap[startPoint.y, startPoint.x] = 1;
 
-    //     GameObject floorParent = new GameObject("Floors");
+    //     GameObject floorParent = new("Floors");
 
     //     Vector3 spawnPos = new(startPoint.x, 0, startPoint.y);
     //     Vector3 startNodePos = spawnPos + new Vector3(SPAWN_OFFSET / 2f, 0, SPAWN_OFFSET / 2f);
     //     Instantiate(floorPrefab, spawnPos + new Vector3(SPAWN_OFFSET, 0, SPAWN_OFFSET), floorPrefab.transform.rotation, floorParent.transform);
+
     //     traversalGraph.AddNode(startNodePos);
 
     //     int[] dx = { -1, 1, 0, 0 };
@@ -117,7 +118,7 @@ public class DungeonBuilder : MonoBehaviour
     // }
 
 
-    // DFS VERSION (worse but its recursive)
+    // DFS VERSION 
     /// <summary>
     /// Starts the floor spawning process
     /// </summary>

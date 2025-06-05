@@ -7,7 +7,6 @@ public class PathFinder : MonoBehaviour
     private Vector3 startNode;
     private Vector3 endNode;
     
-    private List<Vector3> path = new();
     private HashSet<Vector3> discovered = new();
     
     private Graph<Vector3> _graph;
@@ -37,7 +36,6 @@ public class PathFinder : MonoBehaviour
         endNode = GetClosestNodeToPosition(to);
 
         List<Vector3> shortestPath = AStar(startNode, endNode);
-        path = shortestPath; //Used for drawing the path
         
         return shortestPath;
     }
