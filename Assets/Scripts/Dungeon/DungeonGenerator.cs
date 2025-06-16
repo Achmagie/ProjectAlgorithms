@@ -184,7 +184,7 @@ public class DungeonGenerator
         }
         
         while (queue.Count > 0) {
-            queue.Sort((a, b) => a.cost.CompareTo(b.cost));
+            queue.Sort((a, b) => a.cost.CompareTo(b.cost)); //inefficient use priority queue 
             (var nextRoom, var connectingDoor, _) = queue[0];
             queue.RemoveAt(0);
 

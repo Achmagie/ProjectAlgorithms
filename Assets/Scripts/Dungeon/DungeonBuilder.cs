@@ -160,7 +160,7 @@ public class DungeonBuilder : MonoBehaviour
         Instantiate(floorPrefab, spawnPos + new Vector3(SPAWN_OFFSET, 0, SPAWN_OFFSET), floorPrefab.transform.rotation, floorParent.transform);
         traversalGraph.AddNode(nodePos);
 
-        List<Vector3> currentNodes = traversalGraph.GetNodes();
+        List<Vector3> currentNodes = traversalGraph.GetNodes(); // !! change list to hashset, reduces contains call later from o(n) -> o(1)
         foreach (var dir in new Vector2Int[] {
             new(-1, 0), new(1, 0), new(0, -1), new(0, 1),
             new(-1, 1), new(1, 1), new(-1, -1), new(1, -1)
