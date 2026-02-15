@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "ProjectAlgorithms.sln"
+    "dotnet.defaultSolution": "ProjectAlgorithms.slnx"
 }
